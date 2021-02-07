@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class PuaaLookup {
 	public static void main(String[] args) {
+		try { System.setProperty("apple.awt.UIElement", "true"); } catch (Exception e) {}
 		if (args.length == 0) {
 			printHelp();
 			return;
