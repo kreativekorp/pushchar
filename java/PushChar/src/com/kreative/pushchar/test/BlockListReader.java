@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
-
 import com.kreative.pushchar.unilib.BlockList;
 
 public class BlockListReader extends BlockList {

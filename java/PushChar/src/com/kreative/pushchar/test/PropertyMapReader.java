@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Scanner;
-
 import com.kreative.pushchar.unilib.PropertyMap;
 
 public class PropertyMapReader extends PropertyMap {
