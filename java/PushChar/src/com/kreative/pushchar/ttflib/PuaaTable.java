@@ -8,13 +8,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class PuaaTable {
-	private Map<String,List<PuaaEntry>> entries;
+	private SortedMap<String,List<PuaaEntry>> entries;
 	
 	public PuaaTable(InputStream in) throws IOException { read(in); }
 	public PuaaTable(byte[] data) throws IOException { read(data); }
@@ -54,14 +56,28 @@ public class PuaaTable {
 			this.entries.put(prop, list);
 		}
 		
-		this.entries = Collections.unmodifiableMap(this.entries);
+		this.entries = Collections.unmodifiableSortedMap(this.entries);
 	}
 	
-	public Map<String,List<PuaaEntry>> getEntries() { return entries; }
-	public Set<String> getProperties() { return entries.keySet(); }
-	public List<PuaaEntry> getPropertyEntries(String prop) { return entries.get(prop); }
-	public Map<Integer,String> getPropertyMap(String prop) { return mapFromEntries(entries.get(prop)); }
-	public List<PuaaEntry> getPropertyRuns(String prop) { return runsFromEntries(entries.get(prop)); }
+	public Set<String> getProperties() {
+		return entries.keySet();
+	}
+	
+	public List<PuaaEntry> getPropertyEntries(String prop) {
+		return entries.get(prop);
+	}
+	
+	public Map<Integer,String> getPropertyMap(String prop) {
+		return mapFromEntries(entries.get(prop));
+	}
+	
+	public SortedMap<Integer,String> getPropertySortedMap(String prop) {
+		return sortedMapFromEntries(entries.get(prop));
+	}
+	
+	public List<PuaaEntry> getPropertyRuns(String prop) {
+		return runsFromEntries(entries.get(prop));
+	}
 	
 	static List<PuaaEntry> readEntryList(DataInputStream in, int to, int sho) throws IOException {
 		if (sho > 0) {
@@ -79,22 +95,33 @@ public class PuaaTable {
 	
 	static Map<Integer,String> mapFromEntries(List<PuaaEntry> entries) {
 		if (entries == null) return null;
-		Map<Integer,String> m = new TreeMap<Integer,String>();
+		Map<Integer,String> m = new HashMap<Integer,String>();
+		putEntriesIntoMap(entries, m);
+		return Collections.unmodifiableMap(m);
+	}
+	
+	static SortedMap<Integer,String> sortedMapFromEntries(List<PuaaEntry> entries) {
+		if (entries == null) return null;
+		SortedMap<Integer,String> m = new TreeMap<Integer,String>();
+		putEntriesIntoMap(entries, m);
+		return Collections.unmodifiableSortedMap(m);
+	}
+	
+	static void putEntriesIntoMap(List<PuaaEntry> entries, Map<Integer,String> map) {
 		for (PuaaEntry entry : entries) {
-			for (int cp = entry.getFirstCodePoint(); cp <= entry.getLastCodePoint(); cp++) {
-				if (m.containsKey(cp)) {
-					m.put(cp, m.get(cp) + entry.getPropertyString(cp));
-				} else {
-					m.put(cp, entry.getPropertyString(cp));
-				}
+			int fcp = entry.getFirstCodePoint();
+			int lcp = entry.getLastCodePoint();
+			for (int cp = fcp; cp <= lcp; cp++) {
+				String ov = map.get(cp);
+				String nv = entry.getPropertyString(cp);
+				map.put(cp, (ov == null) ? nv : (ov + nv));
 			}
 		}
-		return Collections.unmodifiableMap(m);
 	}
 	
 	static List<PuaaEntry> runsFromEntries(List<PuaaEntry> entries) {
 		if (entries == null) return null;
-		Map<Integer,String> m = mapFromEntries(entries);
+		SortedMap<Integer,String> m = sortedMapFromEntries(entries);
 		List<PuaaEntry> runs = new ArrayList<PuaaEntry>();
 		PuaaEntry run = null;
 		for (Map.Entry<Integer,String> e : m.entrySet()) {

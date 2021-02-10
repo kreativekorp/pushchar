@@ -1,10 +1,13 @@
-package com.kreative.pushchar.ttflib;
+package com.kreative.pushchar.test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import com.kreative.pushchar.ttflib.TtcFile;
+import com.kreative.pushchar.ttflib.TtcFont;
+import com.kreative.pushchar.ttflib.TtfTable;
 
-public class TtcName {
+public class TtcToc {
 	public static void main(String[] args) {
 		for (String arg : args) {
 			System.out.println(arg);
@@ -13,14 +16,13 @@ public class TtcName {
 				List<TtcFont> fonts = ttc.getFonts();
 				for (int i = 0; i < fonts.size(); i++) {
 					System.out.println("\tFont #" + i);
-					NameTable names = fonts.get(i).getTableAs(NameTable.class, "name");
-					if (names != null) {
-						for (int j = 0; j < 256; j++) {
-							String name = names.getName(j);
-							if (name != null) {
-								System.out.println("\t\t" + j + "\t" + name);
-							}
-						}
+					System.out.println("\t\tTag\tOffset\tLength");
+					for (TtfTable t : fonts.get(i).getTables()) {
+						System.out.println(
+							"\t\t" + t.getTagString() +
+							"\t" + t.getOffset() +
+							"\t" + t.getLength()
+						);
 					}
 				}
 			} catch (IOException e) {

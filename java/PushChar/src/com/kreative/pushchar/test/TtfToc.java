@@ -1,7 +1,9 @@
-package com.kreative.pushchar.ttflib;
+package com.kreative.pushchar.test;
 
 import java.io.File;
 import java.io.IOException;
+import com.kreative.pushchar.ttflib.TtfFile;
+import com.kreative.pushchar.ttflib.TtfTable;
 
 public class TtfToc {
 	public static void main(String[] args) {

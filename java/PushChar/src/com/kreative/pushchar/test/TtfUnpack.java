@@ -1,8 +1,10 @@
-package com.kreative.pushchar.ttflib;
+package com.kreative.pushchar.test;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import com.kreative.pushchar.ttflib.TtfFile;
+import com.kreative.pushchar.ttflib.TtfTable;
 
 public class TtfUnpack {
 	public static void main(String[] args) {

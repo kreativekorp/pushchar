@@ -137,7 +137,7 @@ public class PuaaEntry {
 	
 	static String toHexString(int v) {
 		String s = Integer.toHexString(v).toUpperCase();
-		while (s.length() < 4) s = "0" + s;
+		if (s.length() < 4) s = ("0000" + s).substring(s.length());
 		return s;
 	}
 	

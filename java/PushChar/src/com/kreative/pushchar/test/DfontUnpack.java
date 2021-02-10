@@ -1,8 +1,11 @@
-package com.kreative.pushchar.ttflib;
+package com.kreative.pushchar.test;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import com.kreative.pushchar.ttflib.DfontFile;
+import com.kreative.pushchar.ttflib.DfontResource;
+import com.kreative.pushchar.ttflib.DfontResourceType;
 
 public class DfontUnpack {
 	public static void main(String[] args) {

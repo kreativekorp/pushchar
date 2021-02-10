@@ -1,4 +1,4 @@
-package com.kreative.pushchar.ttflib;
+package com.kreative.pushchar.test;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import com.kreative.pushchar.ttflib.TtcFile;
+import com.kreative.pushchar.ttflib.TtcFont;
+import com.kreative.pushchar.ttflib.TtfTable;
 
 public class TtcUnpack {
 	public static void main(String[] args) {

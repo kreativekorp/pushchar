@@ -1,4 +1,4 @@
-package com.kreative.pushchar.ttflib;
+package com.kreative.pushchar.test;
 
 import java.awt.Font;
 import java.awt.font.OpenType;
@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.kreative.pushchar.ttflib.FindOpenType;
+import com.kreative.pushchar.ttflib.PuaaEntry;
+import com.kreative.pushchar.ttflib.PuaaTable;
+import com.kreative.pushchar.ttflib.TtfFile;
 
 public class PuaaLookup {
 	public static void main(String[] args) {
@@ -99,7 +103,7 @@ public class PuaaLookup {
 		for (String prop : t.getProperties()) tables.put(prop, t.getPropertyMap(prop));
 		
 		for (int cp : c) {
-			System.out.println("U+" + PuaaEntry.toHexString(cp) + ":");
+			System.out.println("U+" + toHexString(cp) + ":");
 			for (String prop : t.getProperties()) {
 				if (p.isEmpty() || p.contains(prop)) {
 					if (tables.get(prop).containsKey(cp)) {
@@ -125,10 +129,10 @@ public class PuaaLookup {
 				System.out.println(prop + ":");
 				for (PuaaEntry e : t.getPropertyRuns(prop)) {
 					StringBuffer sb = new StringBuffer("  ");
-					sb.append(PuaaEntry.toHexString(e.getFirstCodePoint()));
+					sb.append(toHexString(e.getFirstCodePoint()));
 					if (e.getFirstCodePoint() != e.getLastCodePoint()) {
 						sb.append("..");
-						sb.append(PuaaEntry.toHexString(e.getLastCodePoint()));
+						sb.append(toHexString(e.getLastCodePoint()));
 					}
 					sb.append(":");
 					while (sb.length() < 18) sb.append(" ");
@@ -144,6 +148,12 @@ public class PuaaLookup {
 		for (String prop : t.getProperties()) {
 			System.out.println("  " + prop);
 		}
+	}
+	
+	private static String toHexString(int v) {
+		String s = Integer.toHexString(v).toUpperCase();
+		if (s.length() < 4) s = ("0000" + s).substring(s.length());
+		return s;
 	}
 	
 	private static int parseCP(String s) {
