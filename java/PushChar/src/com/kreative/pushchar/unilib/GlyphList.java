@@ -43,11 +43,15 @@ public class GlyphList {
 		return name;
 	}
 	
-	public int get(int index) {
+	public int[] getCodePoints() {
+		return codePoints;
+	}
+	
+	public int getCodePoint(int index) {
 		return codePoints[index];
 	}
 	
-	public int length() {
+	public int size() {
 		return codePoints.length;
 	}
 	

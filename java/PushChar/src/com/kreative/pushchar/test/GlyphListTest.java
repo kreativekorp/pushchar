@@ -23,8 +23,8 @@ public class GlyphListTest {
 				if (binaryMode) gl = new GlyphList(new DataInputStream(in));
 				else gl = new GlyphList(file.getName().replaceAll("\\.[Tt][Xx][Tt]$", ""), in);
 				System.out.println(gl.getName());
-				for (int i = 0, n = gl.length(); i < n; i++) {
-					System.out.print(Character.toChars(gl.get(i)));
+				for (int cp : gl.getCodePoints()) {
+					System.out.print(Character.toChars(cp));
 				}
 				System.out.println();
 			} catch (IOException e) {

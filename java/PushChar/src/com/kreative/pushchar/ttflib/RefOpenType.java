@@ -15,7 +15,7 @@ public class RefOpenType implements OpenType {
 	@Override
 	public byte[] getFontTable(int tag) {
 		try { return (byte[])getTableBytes.invoke(instance, tag); }
-		catch (Exception e) { e.printStackTrace(); return null; }
+		catch (Exception e) { return null; }
 	}
 	
 	@Override

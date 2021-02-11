@@ -26,6 +26,16 @@ public abstract class CharInFont {
 	public abstract boolean[] isCharInFont(String fontName, int startChar, int endChar);
 	public abstract boolean[] isCharInFont(String fontName, int[] charsToCheck);
 	
+	public boolean areCharsInFont(String fontName, String s) {
+		int i = 0, n = s.length();
+		while (i < n) {
+			int ch = s.codePointAt(i);
+			if (!isCharInFont(fontName, ch)) return false;
+			i += Character.charCount(ch);
+		}
+		return true;
+	}
+	
 	public BitSet allCharsInFont(String fontName) {
 		BitSet res = new BitSet(0x110000);
 		for (int plane = 0; plane < 0x110000; plane += 0x10000) {
