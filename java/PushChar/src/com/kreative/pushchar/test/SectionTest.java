@@ -17,10 +17,11 @@ public class SectionTest {
 		} else {
 			for (SectionBuilder sb : builders) {
 				if (sb.getName().equalsIgnoreCase(args[0])) {
-					Font font = new Font(args[1], 0, 1);
+					Font font = new Font(args[1], 0, 24);
 					List<Section> sections = sb.build(font);
 					for (Section s : sections) {
-						System.out.println("\u001B[44m\u001B[37m\u001B[2K" + s.getTitleWithCount() + "\u001B[0m");
+						if (s.isPUA()) System.out.print("\u001B[45m\u001B[97m PUA \u001B[0m");
+						System.out.println("\u001B[44m\u001B[37m " + s.getTitleWithCount() + " \u001B[0K\u001B[0m");
 						for (int y = 0, n = s.getRowCount(); y < n; y++) {
 							for (int x = 0; x < Section.COLUMN_COUNT; x++) {
 								String ch = s.getChar(y, x);

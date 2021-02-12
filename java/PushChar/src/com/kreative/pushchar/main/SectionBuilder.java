@@ -90,12 +90,12 @@ public abstract class SectionBuilder {
 		@Override
 		public List<Section> build(Font font) {
 			List<Section> sections = new ArrayList<Section>();
-			Section s = Section.forEncodingTable(font, enc.getName(), enc);
+			Section s = Section.forEncodingTable(font, enc.getName(), enc, 0);
 			if (s.getVisibleCount() > 0) sections.add(s);
-			build(font, enc, "Subtable ", sections);
+			build(font, "Subtable ", enc, 0, sections);
 			return sections;
 		}
-		private void build(Font font, EncodingTable enc, String pfx, List<Section> sections) {
+		private void build(Font font, String pfx, EncodingTable enc, int idx, List<Section> sections) {
 			for (int i = 0; i < 256; i++) {
 				EncodingTable sub = enc.getSubtable(i);
 				if (sub != null) {
@@ -103,9 +103,10 @@ public abstract class SectionBuilder {
 					sb.append(Character.toUpperCase(Character.forDigit(i >> 4, 16)));
 					sb.append(Character.toUpperCase(Character.forDigit(i & 15, 16)));
 					String subpfx = sb.toString();
-					Section s = Section.forEncodingTable(font, subpfx, sub);
+					int subidx = (idx + i) << 8;
+					Section s = Section.forEncodingTable(font, subpfx, sub, subidx);
 					if (s.getVisibleCount() > 0) sections.add(s);
-					build(font, sub, subpfx, sections);
+					build(font, subpfx, sub, subidx, sections);
 				}
 			}
 		}

@@ -36,6 +36,7 @@ public class SectionBuilderFactory {
 	}
 	
 	public BlockList blockList() { return blockList; }
+	public SortedSet<Charset> charsets() { return charsets; }
 	public SortedSet<Encoding> encodings() { return encodings; }
 	public SortedSet<GlyphList> glyphLists() { return glyphLists; }
 	
@@ -67,10 +68,34 @@ public class SectionBuilderFactory {
 		return gl != null && glyphLists.add(gl);
 	}
 	
+	private SectionBuilder unicodeBuilder = null;
+	public SectionBuilder getUnicodeBuilder() {
+		if (unicodeBuilder == null) unicodeBuilder = new SectionBuilder.ForBlockList(blockList);
+		return unicodeBuilder;
+	}
+	
 	public List<SectionBuilder> createBuilders() {
 		List<SectionBuilder> builders = new ArrayList<SectionBuilder>();
-		builders.add(new SectionBuilder.ForBlockList(blockList));
-		for (Charset cs : charsets) builders.add(new SectionBuilder.ForCharset(cs));
+		builders.add(getUnicodeBuilder());
+		for (Charset cs : charsets) {
+			// Charsets known to not play well with the table generator.
+			// Some take a long time to decode and some just break entirely.
+			String name = cs.displayName().toUpperCase();
+			if (name.equals("CESU-8")) continue; // no astral chars
+			if (name.equals("GB18030")) continue; // slow
+			if (name.startsWith("ISO-2022-")) continue; // broken
+			if (name.startsWith("UTF-")) continue; // 16 slow, 32 broken
+			if (name.startsWith("X-EUC")) continue; // slow
+			if (name.startsWith("X-IBM93")) continue; // broken
+			if (name.equals("X-IBM964")) continue; // slow
+			if (name.equals("X-IBM1364")) continue; // broken
+			if (name.startsWith("X-ISO-2022-")) continue; // broken
+			if (name.equals("X-JISAUTODETECT")) continue; // broken
+			if (name.startsWith("X-UTF-")) continue; // broken
+			if (name.startsWith("X-WINDOWS-5022")) continue; // broken
+			if (name.startsWith("X-WINDOWS-ISO2022")) continue; // broken
+			builders.add(new SectionBuilder.ForCharset(cs));
+		}
 		for (Encoding enc : encodings) builders.add(new SectionBuilder.ForEncoding(enc));
 		for (GlyphList gl : glyphLists) builders.add(new SectionBuilder.ForGlyphList(gl));
 		return builders;

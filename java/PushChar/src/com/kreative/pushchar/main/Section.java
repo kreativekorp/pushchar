@@ -12,6 +12,7 @@ public class Section {
 	public static final int COLUMN_COUNT = 16;
 	
 	private final String title;
+	private final boolean isPUA;
 	private final int visibleCount;
 	private final int definedCount;
 	private final int rowCount;
@@ -19,10 +20,11 @@ public class Section {
 	private final String[][] chars;
 	
 	private Section(
-		String title, int visibleCount, int definedCount,
+		String title, boolean isPUA, int visibleCount, int definedCount,
 		int rowCount, int[][] indices, String[][] chars
 	) {
 		this.title = title;
+		this.isPUA = isPUA;
 		this.visibleCount = visibleCount;
 		this.definedCount = definedCount;
 		this.rowCount = rowCount;
@@ -32,6 +34,10 @@ public class Section {
 	
 	public String getTitle() {
 		return title;
+	}
+	
+	public boolean isPUA() {
+		return isPUA;
 	}
 	
 	public int getVisibleCount() {
@@ -89,14 +95,18 @@ public class Section {
 				chars.add(rca);
 			}
 		}
+		boolean isPUA = (
+			block.lastCodePoint >= 0xE000 && block.firstCodePoint < 0xF900 ||
+			block.lastCodePoint >= 0xF0000
+		);
 		return new Section(
-			block.blockName, count, cinf.length, rowCount,
+			block.blockName, isPUA, count, cinf.length, rowCount,
 			indices.toArray(new int[rowCount][]),
 			chars.toArray(new String[rowCount][])
 		);
 	}
 	
-	public static Section forEncodingTable(Font font, String name, EncodingTable table) {
+	public static Section forEncodingTable(Font font, String name, EncodingTable table, int index) {
 		CharInFont cinf = CharInFont.getInstance();
 		String fontName = font.getName();
 		int rowCount = 0;
@@ -108,7 +118,7 @@ public class Section {
 			String[] rca = new String[COLUMN_COUNT];
 			for (int i = 0; i < COLUMN_COUNT; i++) {
 				if (ei < 256) {
-					ria[i] = ei;
+					ria[i] = index + ei;
 					String s = table.getSequence(ei);
 					if (s != null) {
 						total++;
@@ -125,7 +135,7 @@ public class Section {
 			chars.add(rca);
 		}
 		return new Section(
-			name, count, total, rowCount,
+			name, false, count, total, rowCount,
 			indices.toArray(new int[rowCount][]),
 			chars.toArray(new String[rowCount][])
 		);
@@ -158,7 +168,7 @@ public class Section {
 			chars.add(rca);
 		}
 		return new Section(
-			gl.getName(), count, cinf.length, rowCount,
+			gl.getName(), false, count, cinf.length, rowCount,
 			indices.toArray(new int[rowCount][]),
 			chars.toArray(new String[rowCount][])
 		);
