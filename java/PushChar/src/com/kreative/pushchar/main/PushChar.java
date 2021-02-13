@@ -64,7 +64,7 @@ public class PushChar {
 				@Override
 				public void run() {
 					Font font = new Font(ffName, ffStyle, ffSize);
-					PushCharFrame f = new PushCharFrame(font);
+					PushCharFrame f = new PushCharFrame(font, false, null, null);
 					f.setDefaultCloseOperation(PushCharFrame.DISPOSE_ON_CLOSE);
 					f.setVisible(true);
 				}

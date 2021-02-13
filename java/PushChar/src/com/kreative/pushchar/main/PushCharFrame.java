@@ -3,6 +3,9 @@ package com.kreative.pushchar.main;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,17 +17,27 @@ public class PushCharFrame extends JFrame {
 	private final SelectorPanel selectorPanel;
 	private final SectionListPanel mainPanel;
 	private final CharDataLabel label;
+	private final CopyMenuBuilder menuBuilder;
+	private final NameResolver resolver;
 	
-	public PushCharFrame(Font font) {
+	public PushCharFrame(Font font, boolean hidable, int[] pasteKeyStroke, Window triggerWindow) {
 		super("PushChar");
 		SectionBuilder u = SectionBuilderFactory.getInstance().getUnicodeBuilder();
 		
-		label = new CharDataLabel();
+		resolver = new NameResolver();
+		resolver.setDataFont(font);
+		
+		menuBuilder = new CopyMenuBuilder(
+			resolver,
+			(hidable ? this : null),
+			pasteKeyStroke,
+			triggerWindow
+		);
+		
+		label = new CharDataLabel(resolver);
 		label.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-		label.setDataFont(font);
 		
 		mainPanel = new SectionListPanel();
-		mainPanel.addSectionPanelListener(label);
 		mainPanel.setAutoselects(true);
 		mainPanel.setFont(font);
 		mainPanel.setSections(u.build(font));
@@ -50,13 +63,39 @@ public class PushCharFrame extends JFrame {
 		setSize(new Dimension(520, 560));
 		setLocationRelativeTo(null);
 		
+		mainPanel.addSectionPanelMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				menuBuilder.receiveEvent(e);
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				menuBuilder.receiveEvent(e);
+			}
+		});
+		
+		mainPanel.addSectionPanelListener(new SectionPanelListener() {
+			@Override
+			public void selectionChanged(SectionPanel sp, Section s, int row, int column) {
+				if (row < 0 || column < 0) {
+					label.setDataChar(-1, null);
+					menuBuilder.setDataChar(null);
+				} else {
+					int index = s.getIndex(row, column);
+					String chars = s.getChar(row, column);
+					label.setDataChar(index, chars);
+					menuBuilder.setDataChar(chars);
+				}
+			}
+		});
+		
 		selectorPanel.addSelectorPanelListener(new SelectorPanelListener() {
 			@Override
 			public void fontFamilyChanged(SelectorPanel sp, Font font, SectionBuilder builder) {
 				mainPanel.clearSections();
 				mainPanel.setFont(font);
 				mainPanel.setSections(builder.build(font));
-				label.setDataFont(font);
+				resolver.setDataFont(font);
 			}
 			@Override
 			public void fontStyleChanged(SelectorPanel sp, Font font, SectionBuilder builder) {

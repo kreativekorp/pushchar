@@ -8,49 +8,22 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.JComponent;
-import com.kreative.pushchar.ttflib.PuaaTable;
 
-public class CharDataLabel extends JComponent implements SectionPanelListener {
+public class CharDataLabel extends JComponent {
 	private static final long serialVersionUID = 1L;
 	
 	private static final Color PUA_COLOR = new Color(0xFF663399);
 	private static final Color PUA_TEXT = Color.white;
 	
-	private final Map<Integer,String> baseCategoryMap;
-	private final Map<Integer,String> baseNameMap;
-	private Map<Integer,String> categoryMap;
-	private Map<Integer,String> nameMap;
+	private final NameResolver resolver;
 	private int index = -1;
 	private int codePoint = -1;
 	private String category = null;
 	private String name = null;
 	
-	public CharDataLabel() {
-		PuaaTable base = PuaaCache.getPuaaTable("unidata.ucd");
-		this.baseCategoryMap = base.getPropertyMap("General_Category");
-		this.baseNameMap = base.getPropertyMap("Name");
-		this.categoryMap = this.baseCategoryMap;
-		this.nameMap = this.baseNameMap;
-	}
-	
-	public void setDataFont(Font font) {
-		PuaaTable puaa = PuaaCache.getPuaaTable(font);
-		if (puaa == null) {
-			this.categoryMap = this.baseCategoryMap;
-			this.nameMap = this.baseNameMap;
-		} else {
-			this.categoryMap = new HashMap<Integer,String>();
-			this.nameMap = new HashMap<Integer,String>();
-			if (baseCategoryMap != null) categoryMap.putAll(baseCategoryMap);
-			if (baseNameMap != null) nameMap.putAll(baseNameMap);
-			Map<Integer,String> puaaCategoryMap = puaa.getPropertyMap("General_Category");
-			Map<Integer,String> puaaNameMap = puaa.getPropertyMap("Name");
-			if (puaaCategoryMap != null) categoryMap.putAll(puaaCategoryMap);
-			if (puaaNameMap != null) nameMap.putAll(puaaNameMap);
-		}
+	public CharDataLabel(NameResolver resolver) {
+		this.resolver = resolver;
 	}
 	
 	public void setDataChar(int index, String s) {
@@ -62,8 +35,8 @@ public class CharDataLabel extends JComponent implements SectionPanelListener {
 		} else if (s.codePointCount(0, s.length()) == 1) {
 			this.index = index;
 			this.codePoint = s.codePointAt(0);
-			this.category = (categoryMap == null) ? null : categoryMap.get(codePoint);
-			this.name = (nameMap == null) ? null : nameMap.get(codePoint);
+			this.category = resolver.getCategory(codePoint);
+			this.name = resolver.getName(codePoint);
 		} else {
 			this.index = index;
 			this.codePoint = -1;
@@ -163,11 +136,5 @@ public class CharDataLabel extends JComponent implements SectionPanelListener {
 		int w = tabWidth * 8 + i.left + i.right;
 		int h = fm.getHeight() + i.top + i.bottom;
 		return new Dimension(w, h);
-	}
-	
-	@Override
-	public void selectionChanged(SectionPanel sp, Section s, int row, int column) {
-		if (row < 0 || column < 0) setDataChar(-1, null);
-		else setDataChar(s.getIndex(row, column), s.getChar(row, column));
 	}
 }

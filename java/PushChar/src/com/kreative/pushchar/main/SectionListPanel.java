@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
@@ -17,6 +19,7 @@ public class SectionListPanel extends JPanel implements Scrollable {
 	private final List<Section> sections;
 	private final List<SectionPanel> panels;
 	private final List<SectionPanelListener> listeners;
+	private final List<MouseListener> mouseListeners;
 	private boolean autoselects;
 	
 	public SectionListPanel() {
@@ -28,6 +31,7 @@ public class SectionListPanel extends JPanel implements Scrollable {
 		sections = new ArrayList<Section>();
 		panels = new ArrayList<SectionPanel>();
 		listeners = new ArrayList<SectionPanelListener>();
+		mouseListeners = new ArrayList<MouseListener>();
 		autoselects = false;
 	}
 	
@@ -41,6 +45,7 @@ public class SectionListPanel extends JPanel implements Scrollable {
 		for (SectionPanel sp : panels) {
 			sp.setAutoselects(false);
 			sp.removeSectionPanelListener(mux);
+			sp.removeMouseListener(mouseMux);
 		}
 		mainPanel.removeAll();
 		sections.clear();
@@ -54,6 +59,7 @@ public class SectionListPanel extends JPanel implements Scrollable {
 			SectionPanel sp = new SectionPanel(s, getFont());
 			sp.setAutoselects(autoselects);
 			sp.addSectionPanelListener(mux);
+			sp.addMouseListener(mouseMux);
 			mainPanel.add(sp);
 			sections.add(s);
 			panels.add(sp);
@@ -89,6 +95,14 @@ public class SectionListPanel extends JPanel implements Scrollable {
 		listeners.remove(l);
 	}
 	
+	public void addSectionPanelMouseListener(MouseListener l) {
+		mouseListeners.add(l);
+	}
+	
+	public void removeSectionPanelMouseListener(MouseListener l) {
+		mouseListeners.remove(l);
+	}
+	
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
@@ -121,6 +135,29 @@ public class SectionListPanel extends JPanel implements Scrollable {
 			for (SectionPanelListener l : listeners) {
 				l.selectionChanged(sp, s, row, column);
 			}
+		}
+	};
+	
+	private final MouseListener mouseMux = new MouseListener() {
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			for (MouseListener l : mouseListeners) l.mouseEntered(e);
+		}
+		@Override
+		public void mouseExited(MouseEvent e) {
+			for (MouseListener l : mouseListeners) l.mouseExited(e);
+		}
+		@Override
+		public void mousePressed(MouseEvent e) {
+			for (MouseListener l : mouseListeners) l.mousePressed(e);
+		}
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			for (MouseListener l : mouseListeners) l.mouseReleased(e);
+		}
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			for (MouseListener l : mouseListeners) l.mouseClicked(e);
 		}
 	};
 }
