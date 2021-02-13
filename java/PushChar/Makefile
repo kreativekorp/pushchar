@@ -49,4 +49,18 @@ pushchar.jar: bin
 		-C bin com/kreative/pushchar/unilib
 	chmod +x pushchar.jar
 
-.PHONY: all eclipseall clean eclipseclean
+install: pushchar.jar
+	sudo mkdir -p /usr/local/lib/
+	sudo cp -f pushchar.jar /usr/local/lib/pushchar.jar
+	sudo chmod -f 644 /usr/local/lib/pushchar.jar
+	sudo mkdir -p /usr/local/bin/
+	sudo cp -f dep/pushchar /usr/local/bin/pushchar
+	sudo chmod -f 755 /usr/local/bin/pushchar
+	sudo mkdir -p /usr/share/icons/hicolor/128x128/apps/
+	sudo cp -f dep/pushchar.png /usr/share/icons/hicolor/128x128/apps/pushchar.png
+	sudo chmod -f 644 /usr/share/icons/hicolor/128x128/apps/pushchar.png
+	sudo mkdir -p /usr/share/applications/
+	sudo cp -f dep/pushchar.desktop /usr/share/applications/pushchar.desktop
+	sudo chmod -f 644 /usr/share/applications/pushchar.desktop
+
+.PHONY: all eclipseall clean eclipseclean install
