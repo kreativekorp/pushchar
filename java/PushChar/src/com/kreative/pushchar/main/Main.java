@@ -1,10 +1,13 @@
 package com.kreative.pushchar.main;
 
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-public class PushChar {
+public class Main {
 	private static enum Mode { AUTO, INFO, GUI, ERROR; }
 	
 	public static void main(String[] args) {
@@ -12,6 +15,9 @@ public class PushChar {
 		String fontName = "SansSerif";
 		int fontStyle = Font.PLAIN;
 		int fontSize = 12;
+		boolean showTriggerWindow = true;
+		boolean showPushWindow = false;
+		boolean showSearchWindow = false;
 		
 		int argi = 0;
 		while (argi < args.length) {
@@ -48,6 +54,24 @@ public class PushChar {
 					System.err.println("Missing parameter for option " + arg + ".");
 					mode = Mode.ERROR;
 				}
+			} else if (arg.equalsIgnoreCase("-t") || arg.equalsIgnoreCase("-trigger") || arg.equalsIgnoreCase("--trigger")) {
+				showTriggerWindow = true;
+				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
+			} else if (arg.equalsIgnoreCase("-l") || arg.equalsIgnoreCase("-notrigger") || arg.equalsIgnoreCase("--notrigger")) {
+				showTriggerWindow = false;
+				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
+			} else if (arg.equalsIgnoreCase("-p") || arg.equalsIgnoreCase("-push") || arg.equalsIgnoreCase("--push")) {
+				showPushWindow = true;
+				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
+			} else if (arg.equalsIgnoreCase("-np") || arg.equalsIgnoreCase("-nopush") || arg.equalsIgnoreCase("--nopush")) {
+				showPushWindow = false;
+				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
+			} else if (arg.equalsIgnoreCase("-q") || arg.equalsIgnoreCase("-search") || arg.equalsIgnoreCase("--search")) {
+				showSearchWindow = true;
+				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
+			} else if (arg.equalsIgnoreCase("-nq") || arg.equalsIgnoreCase("-nosearch") || arg.equalsIgnoreCase("--nosearch")) {
+				showSearchWindow = false;
+				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
 			} else {
 				System.err.println("Unrecognized option " + arg + ".");
 				mode = Mode.ERROR;
@@ -58,15 +82,39 @@ public class PushChar {
 			final String ffName = fontName;
 			final int ffStyle = fontStyle;
 			final int ffSize = fontSize;
+			final boolean fsTrigger = showTriggerWindow;
+			final boolean fsPush = showPushWindow;
+			final boolean fsSearch = showSearchWindow;
 			
+			try { System.setProperty("com.apple.mrj.application.apple.menu.about.name", "PushChar"); } catch (Exception e) {}
+			try { System.setProperty("apple.laf.useScreenMenuBar", "true"); } catch (Exception e) {}
 			try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception e) {}
+			
+			try {
+				Toolkit tk = Toolkit.getDefaultToolkit();
+				Field aacn = tk.getClass().getDeclaredField("awtAppClassName");
+				aacn.setAccessible(true);
+				aacn.set(tk, "PushChar");
+			} catch (Exception e) {}
+			
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					Font font = new Font(ffName, ffStyle, ffSize);
-					PushCharFrame f = new PushCharFrame(font, false, null, null);
-					f.setDefaultCloseOperation(PushCharFrame.DISPOSE_ON_CLOSE);
-					f.setVisible(true);
+					if (fsTrigger) {
+						int[] pasteKeyStroke = new int[]{ CopyMenuItem.shortcutKey, KeyEvent.VK_V };
+						TriggerWindow trigger = new TriggerWindow();
+						
+						PushCharFrame push = new PushCharFrame(font, true, pasteKeyStroke, trigger);
+						trigger.setPushWindow(push);
+						
+						push.setVisible(fsPush || fsSearch);
+						trigger.setVisible(!(fsPush || fsSearch));
+					} else {
+						PushCharFrame push = new PushCharFrame(font, false, null, null);
+						push.setDefaultCloseOperation(PushCharFrame.DISPOSE_ON_CLOSE);
+						push.setVisible(true);
+					}
 				}
 			});
 		}
