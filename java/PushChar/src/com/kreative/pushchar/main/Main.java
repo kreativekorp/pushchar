@@ -87,6 +87,7 @@ public class Main {
 			final boolean fsPush = showPushWindow;
 			final boolean fsSearch = showSearchWindow;
 			
+			if (fsTrigger) try { System.setProperty("apple.awt.UIElement", "true"); } catch (Exception e) {}
 			try { System.setProperty("com.apple.mrj.application.apple.menu.about.name", "PushChar"); } catch (Exception e) {}
 			try { System.setProperty("apple.laf.useScreenMenuBar", "true"); } catch (Exception e) {}
 			try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception e) {}

@@ -7,3 +7,4 @@ Exec=java -jar /usr/local/lib/pushchar.jar %F
 Icon=/usr/share/icons/hicolor/128x128/apps/pushchar.png
 Terminal=false
 Type=Application
+Categories=Utility;

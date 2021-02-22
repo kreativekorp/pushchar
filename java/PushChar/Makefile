@@ -2,17 +2,19 @@ SRCFILES := $(shell find src -name \*.java)
 RESFILES := $(shell find src -type f \! -name .\* \! -name \*.java | sed s/^src\\///)
 PACKAGES := $(shell find src -name \*.java | sed -E s/^src\\/\|\\/[^\\/]+$$//g | sort | uniq | tr / .)
 
-all: clean bin doc pushchar-legacy.jar pushchar.jar
+all: clean bin doc pushchar-legacy.jar pushchar.jar PushChar.app
 
-eclipseall: eclipseclean pushchar-legacy.jar pushchar.jar
+eclipseall: eclipseclean pushchar-legacy.jar pushchar.jar PushChar.app
 
 clean:
 	rm -rf bin
 	rm -rf doc
 	rm -rf *.jar
+	rm -rf *.app
 
 eclipseclean:
 	rm -rf *.jar
+	rm -rf *.app
 
 jni-bin: jni-src
 	rm -rf jni-bin
@@ -48,6 +50,15 @@ pushchar.jar: bin
 		-C bin com/kreative/pushchar/ttflib  \
 		-C bin com/kreative/pushchar/unilib
 	chmod +x pushchar.jar
+
+PushChar.app: dep pushchar.jar
+	mkdir -p PushChar.app/Contents/MacOS
+	mkdir -p PushChar.app/Contents/Resources/Java
+	cp -f dep/PkgInfo PushChar.app/Contents
+	cp -f dep/Info.plist PushChar.app/Contents
+	cp -f dep/universalJavaApplicationStub PushChar.app/Contents/MacOS/PushChar
+	cp -f dep/PushChar.icns PushChar.app/Contents/Resources
+	cp -f pushchar.jar PushChar.app/Contents/Resources/Java
 
 install: pushchar.jar
 	sudo mkdir -p /usr/local/lib/
