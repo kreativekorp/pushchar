@@ -80,16 +80,17 @@ public class RobotTest {
 						// Hack for Mac OS to get focus back on the front window.
 						Point p = MouseInfo.getPointerInfo().getLocation();
 						int m = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
-						r.delay(10); r.mouseMove(m, 10);
-						r.delay(10); r.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
-						r.delay(10); r.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
-						r.delay(10); r.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
-						r.delay(10); r.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
-						r.delay(10); r.mouseMove(p.x, p.y);
+						r.delay(10);
+						r.mouseMove(m, 10);
+						r.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
+						r.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
+						r.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
+						r.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
+						r.mouseMove(p.x, p.y);
 						r.delay(10); r.keyPress(KeyEvent.VK_META);
 						r.delay(10); r.keyPress(KeyEvent.VK_V);
-						r.delay(10); r.keyRelease(KeyEvent.VK_V);
-						r.delay(10); r.keyRelease(KeyEvent.VK_META);
+						r.keyRelease(KeyEvent.VK_V);
+						r.keyRelease(KeyEvent.VK_META);
 					} else {
 						r.delay(10);
 						r.keyPress(KeyEvent.VK_CONTROL);
