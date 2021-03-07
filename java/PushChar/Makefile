@@ -2,19 +2,23 @@ SRCFILES := $(shell find src -name \*.java)
 RESFILES := $(shell find src -type f \! -name .\* \! -name \*.java | sed s/^src\\///)
 PACKAGES := $(shell find src -name \*.java | sed -E s/^src\\/\|\\/[^\\/]+$$//g | sort | uniq | tr / .)
 
-all: clean bin doc pushchar-legacy.jar pushchar.jar PushChar.app
+all: clean bin doc pushchar-legacy.jar pushchar.jar pushchar.zip PushChar.app
 
-eclipseall: eclipseclean pushchar-legacy.jar pushchar.jar PushChar.app
+eclipseall: eclipseclean pushchar-legacy.jar pushchar.jar pushchar.zip PushChar.app
 
 clean:
 	rm -rf bin
 	rm -rf doc
 	rm -rf *.jar
+	rm -rf *.zip
 	rm -rf *.app
+	rm -rf *.dmg
 
 eclipseclean:
 	rm -rf *.jar
+	rm -rf *.zip
 	rm -rf *.app
+	rm -rf *.dmg
 
 jni-bin: jni-src
 	rm -rf jni-bin
@@ -51,6 +55,14 @@ pushchar.jar: bin
 		-C bin com/kreative/pushchar/unilib
 	chmod +x pushchar.jar
 
+pushchar.zip: dep pushchar.jar
+	rm -rf PushChar
+	mkdir -p PushChar
+	cp -f dep/PushChar.exe PushChar
+	cp -f pushchar.jar PushChar
+	zip -r pushchar.zip PushChar
+	rm -rf PushChar
+
 PushChar.app: dep pushchar.jar
 	mkdir -p PushChar.app/Contents/MacOS
 	mkdir -p PushChar.app/Contents/Resources/Java
@@ -59,6 +71,13 @@ PushChar.app: dep pushchar.jar
 	cp -f dep/universalJavaApplicationStub PushChar.app/Contents/MacOS/PushChar
 	cp -f dep/PushChar.icns PushChar.app/Contents/Resources
 	cp -f pushchar.jar PushChar.app/Contents/Resources/Java
+
+pushchar.dmg: PushChar.app
+	rm -rf dmgtmp
+	mkdir -p dmgtmp
+	cp -R PushChar.app dmgtmp
+	hdiutil create -fs HFS+ -volname "PushChar" -srcfolder dmgtmp pushchar.dmg
+	rm -rf dmgtmp
 
 install: pushchar.jar
 	sudo mkdir -p /usr/local/lib/

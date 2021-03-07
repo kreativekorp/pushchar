@@ -1,0 +1,30 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <outfile>PushChar.exe</outfile>
+  <jar>pushchar.jar</jar>
+  <dontWrapJar>true</dontWrapJar>
+  <errTitle>PushChar</errTitle>
+  <chdir>.</chdir>
+  <customProcName>true</customProcName>
+  <icon>pushchar.ico</icon>
+  <classPath>
+  	<mainClass>com.kreative.pushchar.main.Main</mainClass>
+  	<cp>pushchar.jar</cp>
+  </classPath>
+  <jre>
+    <minVersion>1.5.0</minVersion>
+    <maxHeapSize>1024</maxHeapSize>
+  </jre>
+  <versionInfo>
+    <fileVersion>2.0.0.0</fileVersion>
+    <txtFileVersion>2.0</txtFileVersion>
+    <fileDescription>PushChar</fileDescription>
+    <copyright>(C) 2008-2021 Kreative Software</copyright>
+    <productVersion>2.0.0.0</productVersion>
+    <txtProductVersion>2.0</txtProductVersion>
+    <productName>PushChar</productName>
+    <companyName>Kreative Software</companyName>
+    <internalName>PushChar</internalName>
+    <originalFilename>PushChar.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>
