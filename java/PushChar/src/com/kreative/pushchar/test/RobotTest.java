@@ -24,6 +24,7 @@ public class RobotTest {
 	private static final JFrame popupWindow = makePopup();
 	
 	public static void main(String[] args) {
+		try { System.setProperty("apple.awt.UIElement", "true"); } catch (Exception e) {}
 		dummyWindow.setVisible(true);
 	}
 	
