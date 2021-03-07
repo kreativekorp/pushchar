@@ -2,6 +2,8 @@ package com.kreative.pushchar.test;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -20,6 +22,14 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 
 public class RobotTest {
+	public static final boolean IS_MAC_OS;
+	static {
+		boolean isMacOS;
+		try { isMacOS = System.getProperty("os.name").toUpperCase().contains("MAC OS"); }
+		catch (Exception e) { isMacOS = false; }
+		IS_MAC_OS = isMacOS;
+	}
+	
 	private static final JWindow dummyWindow = makeDummy();
 	private static final JFrame popupWindow = makePopup();
 	
@@ -66,13 +76,27 @@ public class RobotTest {
 					};
 					c.setContents(s, o);
 					popupWindow.setVisible(false);
-					r.delay(10);
-					r.keyPress(KeyEvent.VK_CONTROL);
-					//r.keyPress(KeyEvent.VK_SHIFT);
-					r.keyPress(KeyEvent.VK_V);
-					r.keyRelease(KeyEvent.VK_V);
-					//r.keyRelease(KeyEvent.VK_SHIFT);
-					r.keyRelease(KeyEvent.VK_CONTROL);
+					if (IS_MAC_OS) {
+						// Hack for Mac OS to get focus back on the front window.
+						Point p = MouseInfo.getPointerInfo().getLocation();
+						int m = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
+						r.delay(10); r.mouseMove(m, 10);
+						r.delay(10); r.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
+						r.delay(10); r.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
+						r.delay(10); r.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
+						r.delay(10); r.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
+						r.delay(10); r.mouseMove(p.x, p.y);
+						r.delay(10); r.keyPress(KeyEvent.VK_META);
+						r.delay(10); r.keyPress(KeyEvent.VK_V);
+						r.delay(10); r.keyRelease(KeyEvent.VK_V);
+						r.delay(10); r.keyRelease(KeyEvent.VK_META);
+					} else {
+						r.delay(10);
+						r.keyPress(KeyEvent.VK_CONTROL);
+						r.keyPress(KeyEvent.VK_V);
+						r.keyRelease(KeyEvent.VK_V);
+						r.keyRelease(KeyEvent.VK_CONTROL);
+					}
 				} catch (Exception x) {
 					x.printStackTrace();
 				}
