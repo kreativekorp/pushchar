@@ -17,22 +17,22 @@ import java.awt.event.MouseListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JWindow;
 
 public class RobotTest {
-	private static final JFrame dummyWindow = makeDummy();
+	private static final JWindow dummyWindow = makeDummy();
 	private static final JFrame popupWindow = makePopup();
 	
 	public static void main(String[] args) {
 		dummyWindow.setVisible(true);
 	}
 	
-	private static JFrame makeDummy() {
-		JFrame f = new JFrame();
+	private static JWindow makeDummy() {
+		JWindow f = new JWindow();
 		JPanel p = new JPanel();
 		MouseListener m = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				dummyWindow.setVisible(false);
 				popupWindow.setVisible(true);
 			}
 		};
@@ -42,7 +42,6 @@ public class RobotTest {
 		f.setContentPane(p);
 		f.setFocusable(false);
 		f.setFocusableWindowState(false);
-		f.setUndecorated(true);
 		f.setAlwaysOnTop(true);
 		f.setSize(20, 20);
 		return f;
