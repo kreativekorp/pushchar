@@ -72,8 +72,6 @@ public class RobotTest {
 					r.keyRelease(KeyEvent.VK_V);
 					//r.keyRelease(KeyEvent.VK_SHIFT);
 					r.keyRelease(KeyEvent.VK_CONTROL);
-					r.delay(10);
-					dummyWindow.setVisible(true);
 				} catch (Exception x) {
 					x.printStackTrace();
 				}
