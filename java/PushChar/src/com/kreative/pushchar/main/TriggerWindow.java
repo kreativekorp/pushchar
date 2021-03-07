@@ -43,7 +43,6 @@ public class TriggerWindow extends JWindow {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (pushWindow == null) return;
-				TriggerWindow.this.setVisible(false);
 				pushWindow.setVisible(true);
 			}
 		});
@@ -52,7 +51,6 @@ public class TriggerWindow extends JWindow {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (searchWindow == null) return;
-				TriggerWindow.this.setVisible(false);
 				searchWindow.setVisible(true);
 			}
 		});
@@ -94,7 +92,6 @@ public class TriggerWindow extends JWindow {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			e.getWindow().setVisible(false);
-			TriggerWindow.this.setVisible(true);
 		}
 	};
 }

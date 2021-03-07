@@ -116,13 +116,13 @@ public class Main {
 						int[] pasteKeyStroke = new int[]{ CopyMenuItem.shortcutKey, KeyEvent.VK_V };
 						TriggerWindow trigger = new TriggerWindow();
 						
-						PushCharFrame push = new PushCharFrame(font, true, pasteKeyStroke, trigger);
+						PushCharFrame push = new PushCharFrame(font, true, pasteKeyStroke);
 						trigger.setPushWindow(push);
 						
 						push.setVisible(fsPush || fsSearch);
 						trigger.setVisible(!(fsPush || fsSearch));
 					} else {
-						PushCharFrame push = new PushCharFrame(font, false, null, null);
+						PushCharFrame push = new PushCharFrame(font, false, null);
 						push.setDefaultCloseOperation(PushCharFrame.DISPOSE_ON_CLOSE);
 						push.setVisible(true);
 					}

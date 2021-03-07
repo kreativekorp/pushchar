@@ -1,5 +1,7 @@
 package com.kreative.pushchar.main;
 
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -10,10 +12,19 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 
 public class CopyMenuItem extends JMenuItem implements ActionListener, ClipboardOwner {
 	private static final long serialVersionUID = 1L;
+	
+	public static final boolean IS_MAC_OS;
+	static {
+		boolean isMacOS;
+		try { isMacOS = System.getProperty("os.name").toUpperCase().contains("MAC OS"); }
+		catch (Exception e) { isMacOS = false; }
+		IS_MAC_OS = isMacOS;
+	}
 	
 	public static final int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 	public static final int shortcutKey = keyMaskToKey(shortcutKeyMask);
@@ -31,17 +42,12 @@ public class CopyMenuItem extends JMenuItem implements ActionListener, Clipboard
 	private final String copyString;
 	private final Window hideWindow;
 	private final int[] keyStroke;
-	private final Window showWindow;
 	
-	public CopyMenuItem(
-		String title, String copyString,
-		Window hideWindow, int[] keyStroke, Window showWindow
-	) {
+	public CopyMenuItem(String title, String copyString, Window hideWindow, int[] keyStroke) {
 		super(title.replace("@", copyString));
 		this.copyString = copyString;
 		this.hideWindow = hideWindow;
 		this.keyStroke = keyStroke;
-		this.showWindow = showWindow;
 		addActionListener(this);
 	}
 	
@@ -54,14 +60,35 @@ public class CopyMenuItem extends JMenuItem implements ActionListener, Clipboard
 			try {
 				Robot r = new Robot();
 				r.delay(10);
-				for (int i = 0, n = keyStroke.length; i < n; i++) r.keyPress(keyStroke[i]);
-				for (int i = keyStroke.length - 1; i >= 0; i--) r.keyRelease(keyStroke[i]);
-				r.delay(10);
+				if (IS_MAC_OS) {
+					// Hack for Mac OS to get focus back on the front window.
+					Point p = MouseInfo.getPointerInfo().getLocation();
+					int m = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
+					r.mouseMove(m, 10);
+					r.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
+					r.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
+					r.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
+					r.mouseRelease(MouseEvent.BUTTON1_DOWN_MASK);
+					r.mouseMove(p.x, p.y);
+					for (int i = 0, n = keyStroke.length; i < n; i++) {
+						r.delay(10);
+						r.keyPress(keyStroke[i]);
+					}
+					for (int i = keyStroke.length - 1; i >= 0; i--) {
+						r.keyRelease(keyStroke[i]);
+					}
+				} else {
+					for (int i = 0, n = keyStroke.length; i < n; i++) {
+						r.keyPress(keyStroke[i]);
+					}
+					for (int i = keyStroke.length - 1; i >= 0; i--) {
+						r.keyRelease(keyStroke[i]);
+					}
+				}
 			} catch (Exception x) {
 				x.printStackTrace();
 			}
 		}
-		if (showWindow != null) showWindow.setVisible(true);
 	}
 	
 	@Override

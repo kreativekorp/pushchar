@@ -13,19 +13,14 @@ public class CopyMenuBuilder {
 	private final NameResolver resolver;
 	private final Window parentWindow;
 	private final int[] pasteKeyStroke;
-	private final Window triggerWindow;
 	private String chars = null;
 	
-	public CopyMenuBuilder(
-		NameResolver resolver, Window parentWindow,
-		int[] pasteKeyStroke, Window triggerWindow
-	) {
+	public CopyMenuBuilder(NameResolver resolver, Window parentWindow, int[] pasteKeyStroke) {
 		PuaaTable entities = PuaaCache.getPuaaTable("entities.ucd");
 		this.entityMap = entities.getPropertyMap("HTML_Entity");
 		this.resolver = resolver;
 		this.parentWindow = parentWindow;
 		this.pasteKeyStroke = pasteKeyStroke;
-		this.triggerWindow = triggerWindow;
 	}
 	
 	public void setDataChar(String s) {
@@ -34,32 +29,32 @@ public class CopyMenuBuilder {
 	
 	public void receiveEvent(MouseEvent e) {
 		if (e.isPopupTrigger()) {
-			JPopupMenu m = buildMenu(parentWindow, pasteKeyStroke, triggerWindow);
+			JPopupMenu m = buildMenu(parentWindow, pasteKeyStroke);
 			m.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
 	
-	public JPopupMenu buildMenu(Window hw, int[] ks, Window sw) {
+	public JPopupMenu buildMenu(Window hw, int[] ks) {
 		JPopupMenu menu = new JPopupMenu();
-		menu.add(new CopyMenuItem("Copy", chars, null, null, null));
+		menu.add(new CopyMenuItem("Copy", chars, null, null));
 		if (hw != null) {
-			menu.add(new CopyMenuItem("Copy and Close", chars, hw, null, sw));
+			menu.add(new CopyMenuItem("Copy and Close", chars, hw, null));
 			if (ks != null) {
-				menu.add(new CopyMenuItem("Copy and Paste", chars, hw, ks, sw));
+				menu.add(new CopyMenuItem("Copy and Paste", chars, hw, ks));
 			}
 		}
 		menu.addSeparator();
-		menu.add(buildSubmenu("Copy", chars, null, null, null));
+		menu.add(buildSubmenu("Copy", chars, null, null));
 		if (hw != null) {
-			menu.add(buildSubmenu("Copy and Close", chars, hw, null, sw));
+			menu.add(buildSubmenu("Copy and Close", chars, hw, null));
 			if (ks != null) {
-				menu.add(buildSubmenu("Copy and Paste", chars, hw, ks, sw));
+				menu.add(buildSubmenu("Copy and Paste", chars, hw, ks));
 			}
 		}
 		return menu;
 	}
 	
-	private JMenu buildSubmenu(String title, String chars, Window hw, int[] ks, Window sw) {
+	private JMenu buildSubmenu(String title, String chars, Window hw, int[] ks) {
 		JMenu menu = new JMenu(title);
 		int[] utf8 = toUTF8(chars);
 		int[] utf16 = toUTF16(chars);
@@ -77,26 +72,26 @@ public class CopyMenuBuilder {
 				: ("\\U" + toHexString(utf32[i], 8))
 			);
 		}
-		menu.add(new CopyMenuItem("Text: @", chars, hw, ks, sw));
-		menu.add(new CopyMenuItem("Dec: @", toDecString(utf32, "", "", ", "), hw, ks, sw));
-		menu.add(new CopyMenuItem("Hex: @", toHexString(utf32, 4, "", "", ", "), hw, ks, sw));
-		menu.add(new CopyMenuItem("U+: @", "U+" + toHexString(utf32, 4, "", "", "+"), hw, ks, sw));
-		menu.add(new CopyMenuItem("Name: @", join(names, ", "), hw, ks, sw));
+		menu.add(new CopyMenuItem("Text: @", chars, hw, ks));
+		menu.add(new CopyMenuItem("Dec: @", toDecString(utf32, "", "", ", "), hw, ks));
+		menu.add(new CopyMenuItem("Hex: @", toHexString(utf32, 4, "", "", ", "), hw, ks));
+		menu.add(new CopyMenuItem("U+: @", "U+" + toHexString(utf32, 4, "", "", "+"), hw, ks));
+		menu.add(new CopyMenuItem("Name: @", join(names, ", "), hw, ks));
 		menu.addSeparator();
-		menu.add(new CopyMenuItem("HTML Name: @", join(entities, ""), hw, ks, sw));
-		menu.add(new CopyMenuItem("HTML Dec: @", toDecString(utf32, "&#", ";", ""), hw, ks, sw));
-		menu.add(new CopyMenuItem("HTML Hex: @", toHexString(utf32, 0, "&#x", ";", ""), hw, ks, sw));
-		menu.add(new CopyMenuItem("URL: @", toHexString(utf8, 2, "%", "", ""), hw, ks, sw));
-		menu.add(new CopyMenuItem("C/C++: @", toHexString(utf8, 2, "\\x", "", ""), hw, ks, sw));
-		menu.add(new CopyMenuItem("Java: @", toHexString(utf16, 4, "\\u", "", ""), hw, ks, sw));
-		menu.add(new CopyMenuItem("Python Text: @", "u'" + chars + "'", hw, ks, sw));
-		menu.add(new CopyMenuItem("Python Hex: @", "u'" + join(python, "") + "'", hw, ks, sw));
+		menu.add(new CopyMenuItem("HTML Name: @", join(entities, ""), hw, ks));
+		menu.add(new CopyMenuItem("HTML Dec: @", toDecString(utf32, "&#", ";", ""), hw, ks));
+		menu.add(new CopyMenuItem("HTML Hex: @", toHexString(utf32, 0, "&#x", ";", ""), hw, ks));
+		menu.add(new CopyMenuItem("URL: @", toHexString(utf8, 2, "%", "", ""), hw, ks));
+		menu.add(new CopyMenuItem("C/C++: @", toHexString(utf8, 2, "\\x", "", ""), hw, ks));
+		menu.add(new CopyMenuItem("Java: @", toHexString(utf16, 4, "\\u", "", ""), hw, ks));
+		menu.add(new CopyMenuItem("Python Text: @", "u'" + chars + "'", hw, ks));
+		menu.add(new CopyMenuItem("Python Hex: @", "u'" + join(python, "") + "'", hw, ks));
 		menu.addSeparator();
-		menu.add(new CopyMenuItem("UTF-8: @", toHexString(utf8, 2, true, " "), hw, ks, sw));
-		menu.add(new CopyMenuItem("UTF-16BE: @", toHexString(utf16, 4, false, " "), hw, ks, sw));
-		menu.add(new CopyMenuItem("UTF-16LE: @", toHexString(utf16, 4, true, " "), hw, ks, sw));
-		menu.add(new CopyMenuItem("UTF-32BE: @", toHexString(utf32, 8, false, " "), hw, ks, sw));
-		menu.add(new CopyMenuItem("UTF-32LE: @", toHexString(utf32, 8, true, " "), hw, ks, sw));
+		menu.add(new CopyMenuItem("UTF-8: @", toHexString(utf8, 2, true, " "), hw, ks));
+		menu.add(new CopyMenuItem("UTF-16BE: @", toHexString(utf16, 4, false, " "), hw, ks));
+		menu.add(new CopyMenuItem("UTF-16LE: @", toHexString(utf16, 4, true, " "), hw, ks));
+		menu.add(new CopyMenuItem("UTF-32BE: @", toHexString(utf32, 8, false, " "), hw, ks));
+		menu.add(new CopyMenuItem("UTF-32LE: @", toHexString(utf32, 8, true, " "), hw, ks));
 		return menu;
 	}
 	

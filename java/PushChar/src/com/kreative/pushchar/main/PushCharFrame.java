@@ -3,7 +3,6 @@ package com.kreative.pushchar.main;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
@@ -20,19 +19,14 @@ public class PushCharFrame extends JFrame {
 	private final CopyMenuBuilder menuBuilder;
 	private final NameResolver resolver;
 	
-	public PushCharFrame(Font font, boolean hidable, int[] pasteKeyStroke, Window triggerWindow) {
+	public PushCharFrame(Font font, boolean hidable, int[] pasteKeyStroke) {
 		super("PushChar");
 		SectionBuilder u = SectionBuilderFactory.getInstance().getUnicodeBuilder();
 		
 		resolver = new NameResolver();
 		resolver.setDataFont(font);
 		
-		menuBuilder = new CopyMenuBuilder(
-			resolver,
-			(hidable ? this : null),
-			pasteKeyStroke,
-			triggerWindow
-		);
+		menuBuilder = new CopyMenuBuilder(resolver, (hidable ? this : null), pasteKeyStroke);
 		
 		label = new CharDataLabel(resolver);
 		label.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
