@@ -1,0 +1,5 @@
+
+*.app
+*.class
+*.jnilib
+*.jar
