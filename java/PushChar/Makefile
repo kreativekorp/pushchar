@@ -30,12 +30,12 @@ jni-bin: jni-src
 
 bin: src
 	mkdir -p bin
-	javac -sourcepath src $(SRCFILES) -d bin
+	javac $(JAVACFLAGS) -sourcepath src $(SRCFILES) -d bin
 	$(foreach res,$(RESFILES),cp src/$(res) bin/$(res);)
 
 doc: src
 	mkdir -p doc
-	javadoc -sourcepath src $(PACKAGES) -d doc
+	javadoc $(JAVADOCFLAGS) -sourcepath src $(PACKAGES) -d doc
 
 pushchar-legacy.jar: bin
 	export COPYFILE_DISABLE=true
