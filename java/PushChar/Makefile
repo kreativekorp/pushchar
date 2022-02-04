@@ -2,9 +2,9 @@ SRCFILES := $(shell find src -name \*.java)
 RESFILES := $(shell find src -type f \! -name .\* \! -name \*.java | sed s/^src\\///)
 PACKAGES := $(shell find src -name \*.java | sed -E s/^src\\/\|\\/[^\\/]+$$//g | sort | uniq | tr / .)
 
-all: clean bin doc pushchar-legacy.jar pushchar.jar pushchar.zip PushChar.app
+all: clean bin doc pushchar.jar pushchar.zip PushChar.app
 
-eclipseall: eclipseclean pushchar-legacy.jar pushchar.jar pushchar.zip PushChar.app
+eclipseall: eclipseclean pushchar.jar pushchar.zip PushChar.app
 
 clean:
 	rm -rf bin
@@ -36,14 +36,6 @@ bin: src
 doc: src
 	mkdir -p doc
 	javadoc $(JAVADOCFLAGS) -sourcepath src $(PACKAGES) -d doc
-
-pushchar-legacy.jar: bin
-	export COPYFILE_DISABLE=true
-	find bin -name .DS_Store -delete
-	jar cmf dep/MANIFEST-LEGACY.MF pushchar-legacy.jar  \
-		-C bin com/kreative/acc/pushchar                \
-		-C bin com/kreative/pushchar/legacy
-	chmod +x pushchar-legacy.jar
 
 pushchar.jar: bin
 	export COPYFILE_DISABLE=true

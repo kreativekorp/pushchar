@@ -27,8 +27,8 @@ public class MakeGlyphDir {
 			if (map.isEmpty()) return;
 			o.output.mkdirs();
 			for (Map.Entry<Integer,BufferedImage> e : map.entrySet()) {
-				File out = new File(o.output, hex(e.getKey()) + ".png");
-				ImageIO.write(e.getValue(), "png", out);
+				String name = (o.decimal ? e.getKey() : hex(e.getKey())) + ".png";
+				ImageIO.write(e.getValue(), "png", new File(o.output, name));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -150,6 +150,10 @@ public class MakeGlyphDir {
 					o.padding.bottom = parseInt(args[argi++]);
 				} else if (matchFlag(arg, argi, args.length, 1, "-pr", "-paddingright", "--padding-right")) {
 					o.padding.right = parseInt(args[argi++]);
+				} else if (matchFlag(arg, argi, args.length, 0, "-h", "-hex", "--hex")) {
+					o.decimal = false;
+				} else if (matchFlag(arg, argi, args.length, 0, "-d", "-dec", "--dec")) {
+					o.decimal = true;
 				} else if (matchFlag(arg, argi, args.length, 1, "-o", "-output", "--output")) {
 					o.output = new File(args[argi++]);
 				} else {
@@ -240,6 +244,7 @@ public class MakeGlyphDir {
 		public Color glyphfg = Color.black;
 		public Color glyphbg = Color.white;
 		public Insets padding = new Insets(1,1,1,1);
+		public boolean decimal = false;
 		public File output = new File("glyphs");
 		public List<Range> ranges = new ArrayList<Range>();
 	}
