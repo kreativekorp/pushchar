@@ -4,9 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,12 +13,25 @@ import javax.swing.JWindow;
 public class TriggerWindow extends JWindow {
 	private static final long serialVersionUID = 1L;
 	
+	public static enum Orientation {
+		WEST_EAST(BorderLayout.WEST, BorderLayout.EAST),
+		NORTH_SOUTH(BorderLayout.NORTH, BorderLayout.SOUTH),
+		EAST_WEST(BorderLayout.EAST, BorderLayout.WEST),
+		SOUTH_NORTH(BorderLayout.SOUTH, BorderLayout.NORTH);
+		private final String pushConstraints;
+		private final String searchConstraints;
+		private Orientation(String pc, String sc) {
+			this.pushConstraints = pc;
+			this.searchConstraints = sc;
+		}
+	}
+	
 	private final JLabel push;
 	private final JLabel search;
-	private Window pushWindow;
-	private Window searchWindow;
+	private JFrame pushWindow;
+	private JFrame searchWindow;
 	
-	public TriggerWindow() {
+	public TriggerWindow(Orientation orientation) {
 		push = new JLabel(new ImageIcon(TriggerWindow.class.getResource("push.png")));
 		search = new JLabel(new ImageIcon(TriggerWindow.class.getResource("search.png")));
 		push.setVisible(false);
@@ -30,8 +40,8 @@ public class TriggerWindow extends JWindow {
 		searchWindow = null;
 		
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(push, BorderLayout.WEST);
-		panel.add(search, BorderLayout.EAST);
+		panel.add(push, orientation.pushConstraints);
+		panel.add(search, orientation.searchConstraints);
 		
 		setContentPane(panel);
 		setFocusable(false);
@@ -64,34 +74,17 @@ public class TriggerWindow extends JWindow {
 		return searchWindow;
 	}
 	
-	public void setPushWindow(Window pushWindow) {
-		if (pushWindow instanceof JFrame) {
-			JFrame f = (JFrame)pushWindow;
-			f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		}
-		if (this.pushWindow != null) this.pushWindow.removeWindowListener(windowListener);
+	public void setPushWindow(JFrame pushWindow) {
+		if (pushWindow != null) pushWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		this.pushWindow = pushWindow;
-		if (this.pushWindow != null) this.pushWindow.addWindowListener(windowListener);
 		push.setVisible(this.pushWindow != null);
 		pack();
 	}
 	
-	public void setSearchWindow(Window searchWindow) {
-		if (searchWindow instanceof JFrame) {
-			JFrame f = (JFrame)searchWindow;
-			f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		}
-		if (this.searchWindow != null) this.searchWindow.removeWindowListener(windowListener);
+	public void setSearchWindow(JFrame searchWindow) {
+		if (searchWindow != null) searchWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		this.searchWindow = searchWindow;
-		if (this.searchWindow != null) this.searchWindow.addWindowListener(windowListener);
 		search.setVisible(this.searchWindow != null);
 		pack();
 	}
-	
-	private final WindowListener windowListener = new WindowAdapter() {
-		@Override
-		public void windowClosing(WindowEvent e) {
-			e.getWindow().setVisible(false);
-		}
-	};
 }
