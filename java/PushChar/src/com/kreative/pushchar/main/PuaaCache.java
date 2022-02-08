@@ -14,7 +14,7 @@ public class PuaaCache {
 	private static final Map<File,PuaaTable> fileCache = new HashMap<File,PuaaTable>();
 	private static final Map<Font,PuaaTable> fontCache = new HashMap<Font,PuaaTable>();
 	
-	public static PuaaTable getPuaaTable(String res) {
+	public static synchronized PuaaTable getPuaaTable(String res) {
 		if (resCache.containsKey(res)) return resCache.get(res);
 		
 		try {
@@ -28,7 +28,7 @@ public class PuaaCache {
 		return null;
 	}
 	
-	public static PuaaTable getPuaaTable(File file) {
+	public static synchronized PuaaTable getPuaaTable(File file) {
 		if (fileCache.containsKey(file)) return fileCache.get(file);
 		
 		try {
@@ -42,7 +42,7 @@ public class PuaaCache {
 		return null;
 	}
 	
-	public static PuaaTable getPuaaTable(Font font) {
+	public static synchronized PuaaTable getPuaaTable(Font font) {
 		if (fontCache.containsKey(font)) return fontCache.get(font);
 		
 		try {

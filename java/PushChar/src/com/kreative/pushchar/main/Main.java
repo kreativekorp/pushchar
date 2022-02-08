@@ -119,12 +119,23 @@ public class Main {
 						PushCharFrame push = new PushCharFrame(font, true, pasteKeyStroke);
 						trigger.setPushWindow(push);
 						
-						push.setVisible(fsPush || fsSearch);
-						trigger.setVisible(!(fsPush || fsSearch));
+						SearchCharFrame search = new SearchCharFrame(true, pasteKeyStroke);
+						trigger.setSearchWindow(search);
+						
+						push.setVisible(fsPush);
+						search.setVisible(fsSearch);
+						trigger.setVisible(true);
 					} else {
-						PushCharFrame push = new PushCharFrame(font, false, null);
-						push.setDefaultCloseOperation(PushCharFrame.DISPOSE_ON_CLOSE);
-						push.setVisible(true);
+						if (fsPush || !fsSearch) {
+							PushCharFrame push = new PushCharFrame(font, false, null);
+							push.setDefaultCloseOperation(PushCharFrame.DISPOSE_ON_CLOSE);
+							push.setVisible(true);
+						}
+						if (fsSearch) {
+							SearchCharFrame search = new SearchCharFrame(false, null);
+							search.setDefaultCloseOperation(SearchCharFrame.DISPOSE_ON_CLOSE);
+							search.setVisible(true);
+						}
 					}
 				}
 			});
