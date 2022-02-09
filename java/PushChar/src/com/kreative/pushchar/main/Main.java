@@ -114,7 +114,10 @@ public class Main {
 					Font font = new Font(ffName, ffStyle, ffSize);
 					if (fsTrigger) {
 						int[] pasteKeyStroke = new int[]{ CopyMenuItem.shortcutKey, KeyEvent.VK_V };
-						TriggerWindow trigger = new TriggerWindow(TriggerWindow.Orientation.WEST_EAST);
+						TriggerWindow trigger = new TriggerWindow(
+							TriggerWindow.Position.NORTHWEST,
+							TriggerWindow.Orientation.WEST_EAST
+						);
 						
 						PushCharFrame push = new PushCharFrame(font, true, pasteKeyStroke);
 						trigger.setPushWindow(push);
