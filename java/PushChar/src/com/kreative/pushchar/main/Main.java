@@ -13,9 +13,9 @@ public class Main {
 	
 	public static void main(String[] args) {
 		Mode mode = Mode.AUTO;
-		String fontName = "SansSerif";
-		int fontStyle = Font.PLAIN;
-		int fontSize = 12;
+		String fontName = null;
+		Integer fontStyle = null;
+		Integer fontSize = null;
 		boolean showTriggerWindow = true;
 		boolean showPushWindow = false;
 		boolean showSearchWindow = false;
@@ -24,8 +24,8 @@ public class Main {
 		while (argi < args.length) {
 			String arg = args[argi++];
 			if (arg.equalsIgnoreCase("-version") || arg.equalsIgnoreCase("--version")) {
-				System.out.println("PushChar 2.0");
-				System.out.println("(c) 2012-2021 Kreative Software");
+				System.out.println("PushChar 2.2");
+				System.out.println("(c) 2012-2022 Kreative Software");
 				if (mode == Mode.AUTO) mode = Mode.INFO;
 			} else if (arg.equalsIgnoreCase("-help") || arg.equalsIgnoreCase("--help")) {
 				System.out.println("java -jar pushchar.jar [ -f <fontname> ] [ -b | -i | -bi ] [ -s <fontsize> ]");
@@ -38,14 +38,17 @@ public class Main {
 					System.err.println("Missing parameter for option " + arg + ".");
 					mode = Mode.ERROR;
 				}
+			} else if (arg.equalsIgnoreCase("-n") || arg.equalsIgnoreCase("-normal") || arg.equalsIgnoreCase("--normal")) {
+				fontStyle = Font.PLAIN;
+				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
 			} else if (arg.equalsIgnoreCase("-b") || arg.equalsIgnoreCase("-bold") || arg.equalsIgnoreCase("--bold")) {
-				fontStyle |= Font.BOLD;
+				fontStyle = Font.BOLD;
 				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
 			} else if (arg.equalsIgnoreCase("-i") || arg.equalsIgnoreCase("-italic") || arg.equalsIgnoreCase("--italic")) {
-				fontStyle |= Font.ITALIC;
+				fontStyle = Font.ITALIC;
 				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
 			} else if (arg.equalsIgnoreCase("-bi") || arg.equalsIgnoreCase("-bolditalic") || arg.equalsIgnoreCase("--bolditalic")) {
-				fontStyle |= Font.BOLD | Font.ITALIC;
+				fontStyle = Font.BOLD | Font.ITALIC;
 				if (mode == Mode.AUTO || mode == Mode.INFO) mode = Mode.GUI;
 			} else if (arg.equalsIgnoreCase("-s") || arg.equalsIgnoreCase("-size") || arg.equalsIgnoreCase("--size")) {
 				if (argi < args.length) {
@@ -81,8 +84,8 @@ public class Main {
 		
 		if (mode == Mode.AUTO || mode == Mode.GUI) {
 			final String ffName = fontName;
-			final int ffStyle = fontStyle;
-			final int ffSize = fontSize;
+			final Integer ffStyle = fontStyle;
+			final Integer ffSize = fontSize;
 			final boolean fsTrigger = showTriggerWindow;
 			final boolean fsPush = showPushWindow;
 			final boolean fsSearch = showSearchWindow;
@@ -111,23 +114,31 @@ public class Main {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					Font font = new Font(ffName, ffStyle, ffSize);
+					Options o = new Options();
+					try { o.read(); }
+					catch (Exception e) {}
+					
+					Font font = new Font(
+						((ffName != null) ? ffName : o.defaultFontName),
+						((ffStyle != null) ? ffStyle : o.defaultFontStyle),
+						((ffSize != null) ? ffSize : o.defaultFontSize)
+					);
+					
 					if (fsTrigger) {
 						int[] pasteKeyStroke = new int[]{ CopyMenuItem.shortcutKey, KeyEvent.VK_V };
-						TriggerWindow trigger = new TriggerWindow(
-							TriggerWindow.Position.NORTHWEST,
-							TriggerWindow.Orientation.WEST_EAST
-						);
+						WindowManager wm = new WindowManager();
 						
 						PushCharFrame push = new PushCharFrame(font, true, pasteKeyStroke);
-						trigger.setPushWindow(push);
+						wm.setPushWindow(push);
 						
 						SearchCharFrame search = new SearchCharFrame(true, pasteKeyStroke);
-						trigger.setSearchWindow(search);
+						wm.setSearchWindow(search);
 						
 						push.setVisible(fsPush);
 						search.setVisible(fsSearch);
-						trigger.setVisible(true);
+						
+						wm.createTriggers(o);
+						wm.setTriggersVisible(true);
 					} else {
 						if (fsPush || !fsSearch) {
 							PushCharFrame push = new PushCharFrame(font, false, null);

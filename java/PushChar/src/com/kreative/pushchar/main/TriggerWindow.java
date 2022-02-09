@@ -9,7 +9,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
@@ -110,11 +109,11 @@ public class TriggerWindow extends JWindow {
 		});
 	}
 	
-	public Window getPushWindow() {
+	public JFrame getPushWindow() {
 		return pushWindow;
 	}
 	
-	public Window getSearchWindow() {
+	public JFrame getSearchWindow() {
 		return searchWindow;
 	}
 	
