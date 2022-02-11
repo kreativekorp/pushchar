@@ -174,46 +174,61 @@ public class NameDatabase {
 	}
 	
 	private static final Pattern CP_PATTERN = Pattern.compile("^\\s*([Uu][+]|[0][Xx]|[$])?([0-9A-Fa-f]{1,6})([Hh])?\\s*$");
-	private static final int MAX_RESULTS = 10;
+	private static final int MAX_RESULTS = 20;
 	
 	public synchronized List<NameEntry> find(String name) {
 		List<NameEntry> results = new ArrayList<NameEntry>();
 		String[] query = querySplit(name);
-		if (query == null) return results;
 		
-		int codePoint = -1;
-		if (query.length == 1) {
-			Matcher m = CP_PATTERN.matcher(query[0]);
-			if (m.matches()) {
-				codePoint = Integer.parseInt(m.group(2), 16);
-				if (codePoint < 0x110000) {
-					String c = resolver.getCategory(codePoint);
-					String n = resolver.getName(codePoint);
-					NameValue v = getOrAdd(codePoint, c, n);
-					if (v.aliases.isEmpty()) v.aliases.add(n);
+		if (query != null) {
+			int codePoint = -1;
+			if (query.length == 1) {
+				Matcher m = CP_PATTERN.matcher(query[0]);
+				if (m.matches()) {
+					codePoint = Integer.parseInt(m.group(2), 16);
+					if (codePoint < 0x110000) {
+						String c = resolver.getCategory(codePoint);
+						String n = resolver.getName(codePoint);
+						NameValue v = getOrAdd(codePoint, c, n);
+						if (v.aliases.isEmpty()) v.aliases.add(n);
+					}
 				}
 			}
-		}
-		
-		for (Map.Entry<NameKey,NameValue> e : names.entrySet()) {
-			if (e.getKey().codePoint == codePoint) {
-				results.add(new NameEntry(e.getKey(), e.getValue(), 0));
-				continue;
-			}
-			if (queryMatch(query, e.getKey(), e.getValue())) {
-				double distance = searchDistance(name, e.getKey().name);
-				for (String alias : e.getValue().aliases) {
-					double d = searchDistance(name, alias);
-					if (d < distance) distance = d;
+			
+			for (Map.Entry<NameKey,NameValue> e : names.entrySet()) {
+				if (e.getKey().codePoint == codePoint) {
+					results.add(new NameEntry(e.getKey(), e.getValue(), 0));
+					continue;
 				}
-				results.add(new NameEntry(e.getKey(), e.getValue(), distance));
+				if (queryMatch(query, e.getKey(), e.getValue())) {
+					double distance = searchDistance(name, e.getKey().name);
+					for (String alias : e.getValue().aliases) {
+						double d = searchDistance(name, alias);
+						if (d < distance) distance = d;
+					}
+					results.add(new NameEntry(e.getKey(), e.getValue(), distance));
+				}
+			}
+			
+			Collections.sort(results);
+			if (results.size() > MAX_RESULTS) {
+				results.subList(MAX_RESULTS, results.size()).clear();
 			}
 		}
 		
-		Collections.sort(results);
-		if (results.size() > MAX_RESULTS) {
-			results.subList(MAX_RESULTS, results.size()).clear();
+		if (results.isEmpty()) {
+			int i = 0, j = name.length();
+			while (i < j) {
+				int codePoint = name.codePointAt(i);
+				String c = resolver.getCategory(codePoint);
+				String n = resolver.getName(codePoint);
+				NameValue v = getOrAdd(codePoint, c, n);
+				if (v.aliases.isEmpty()) v.aliases.add(n);
+				results.add(new NameEntry(new NameKey(codePoint, c, n), v, 0));
+				i += Character.charCount(codePoint);
+			}
 		}
+		
 		return results;
 	}
 	

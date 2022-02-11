@@ -41,7 +41,7 @@ public class SearchCharFrame extends JFrame {
 		
 		JScrollPane resultsPane = new JScrollPane(
 			resultsTable,
-			JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
 		);
 		
@@ -65,6 +65,7 @@ public class SearchCharFrame extends JFrame {
 				if (entries.isEmpty()) return;
 				resultsTable.clearSelection();
 				resultsTable.addRowSelectionInterval(0, 0);
+				resultsTable.scrollRectToVisible(resultsTable.getCellRect(0, 0, true));
 			}
 		});
 		
@@ -108,6 +109,7 @@ public class SearchCharFrame extends JFrame {
 						if (i < 0 || i >= n) i = n - 1;
 						resultsTable.clearSelection();
 						resultsTable.addRowSelectionInterval(i, i);
+						resultsTable.scrollRectToVisible(resultsTable.getCellRect(i, 0, true));
 					}
 					e.consume();
 					break;
@@ -118,6 +120,7 @@ public class SearchCharFrame extends JFrame {
 						if (i < 0 || i >= n) i = 0;
 						resultsTable.clearSelection();
 						resultsTable.addRowSelectionInterval(i, i);
+						resultsTable.scrollRectToVisible(resultsTable.getCellRect(i, 0, true));
 					}
 					e.consume();
 					break;
@@ -126,6 +129,7 @@ public class SearchCharFrame extends JFrame {
 					if (n > 0) {
 						resultsTable.clearSelection();
 						resultsTable.addRowSelectionInterval(0, 0);
+						resultsTable.scrollRectToVisible(resultsTable.getCellRect(0, 0, true));
 					}
 					e.consume();
 					break;
@@ -134,6 +138,7 @@ public class SearchCharFrame extends JFrame {
 					if (n > 0) {
 						resultsTable.clearSelection();
 						resultsTable.addRowSelectionInterval(n-1, n-1);
+						resultsTable.scrollRectToVisible(resultsTable.getCellRect(n-1, 0, true));
 					}
 					e.consume();
 					break;

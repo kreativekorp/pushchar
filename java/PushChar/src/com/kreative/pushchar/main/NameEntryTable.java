@@ -45,7 +45,6 @@ public class NameEntryTable extends JTable {
 		
 		Dimension d = new Dimension(tabWidth*8 + tabWidth*3/4, rowHeight * 10);
 		this.setPreferredScrollableViewportSize(d);
-		this.setPreferredSize(d);
 		
 		this.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 1L;
