@@ -65,6 +65,7 @@ public class TriggerWindow extends JWindow {
 		}
 	}
 	
+	private final WindowManager wm;
 	private final JLabel push;
 	private final JLabel search;
 	private JFrame pushWindow;
@@ -72,7 +73,8 @@ public class TriggerWindow extends JWindow {
 	private Position position;
 	private Orientation orientation;
 	
-	public TriggerWindow(Position position, Orientation orientation) {
+	public TriggerWindow(WindowManager wm, Position position, Orientation orientation) {
+		this.wm = wm;
 		this.push = new JLabel(new ImageIcon(TriggerWindow.class.getResource("push.png")));
 		this.search = new JLabel(new ImageIcon(TriggerWindow.class.getResource("search.png")));
 		this.push.setVisible(false);
@@ -92,21 +94,40 @@ public class TriggerWindow extends JWindow {
 		setAlwaysOnTop(true);
 		packAndSetLocation();
 		
-		push.addMouseListener(new MouseAdapter() {
+		push.addMouseListener(new MyMouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (e.isPopupTrigger()) return;
 				if (pushWindow == null) return;
 				pushWindow.setVisible(true);
 			}
 		});
 		
-		search.addMouseListener(new MouseAdapter() {
+		search.addMouseListener(new MyMouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (e.isPopupTrigger()) return;
 				if (searchWindow == null) return;
 				searchWindow.setVisible(true);
 			}
 		});
+	}
+	
+	private class MyMouseAdapter extends MouseAdapter {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				TriggerMenu m = new TriggerMenu(wm);
+				m.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				TriggerMenu m = new TriggerMenu(wm);
+				m.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
 	}
 	
 	public JFrame getPushWindow() {

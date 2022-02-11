@@ -134,6 +134,9 @@ public class Main {
 						SearchCharFrame search = new SearchCharFrame(true, pasteKeyStroke);
 						wm.setSearchWindow(search);
 						
+						OptionsFrame options = new OptionsFrame(o, wm);
+						wm.setOptionsWindow(options);
+						
 						push.setVisible(fsPush);
 						search.setVisible(fsSearch);
 						

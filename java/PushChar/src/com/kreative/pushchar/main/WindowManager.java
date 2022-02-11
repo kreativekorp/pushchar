@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 public class WindowManager {
 	private JFrame pushWindow = null;
 	private JFrame searchWindow = null;
+	private JFrame optionsWindow = null;
 	private TriggerWindow northWestTrigger = null;
 	private TriggerWindow northEastTrigger = null;
 	private TriggerWindow southWestTrigger = null;
@@ -18,12 +19,20 @@ public class WindowManager {
 		return searchWindow;
 	}
 	
+	public JFrame getOptionsWindow() {
+		return optionsWindow;
+	}
+	
 	public void setPushWindow(JFrame pushWindow) {
 		this.pushWindow = pushWindow;
 	}
 	
 	public void setSearchWindow(JFrame searchWindow) {
 		this.searchWindow = searchWindow;
+	}
+	
+	public void setOptionsWindow(JFrame optionsWindow) {
+		this.optionsWindow = optionsWindow;
 	}
 	
 	public void createTriggers(Options o) {
@@ -35,16 +44,16 @@ public class WindowManager {
 	private TriggerWindow getTriggerWindow(TriggerWindow.Position p, TriggerWindow.Orientation o) {
 		switch (p) {
 			case NORTHWEST:
-				if (northWestTrigger == null) northWestTrigger = new TriggerWindow(p, o);
+				if (northWestTrigger == null) northWestTrigger = new TriggerWindow(this, p, o);
 				return northWestTrigger;
 			case NORTHEAST:
-				if (northEastTrigger == null) northEastTrigger = new TriggerWindow(p, o);
+				if (northEastTrigger == null) northEastTrigger = new TriggerWindow(this, p, o);
 				return northEastTrigger;
 			case SOUTHWEST:
-				if (southWestTrigger == null) southWestTrigger = new TriggerWindow(p, o);
+				if (southWestTrigger == null) southWestTrigger = new TriggerWindow(this, p, o);
 				return southWestTrigger;
 			case SOUTHEAST:
-				if (southEastTrigger == null) southEastTrigger = new TriggerWindow(p, o);
+				if (southEastTrigger == null) southEastTrigger = new TriggerWindow(this, p, o);
 				return southEastTrigger;
 			default:
 				throw new IllegalArgumentException();

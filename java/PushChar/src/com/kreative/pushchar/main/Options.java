@@ -16,6 +16,16 @@ public class Options {
 	public TriggerWindow.Position searchPosition = TriggerWindow.Position.NORTHWEST;
 	public TriggerWindow.Orientation orientation = TriggerWindow.Orientation.WEST_EAST;
 	
+	public Font getDefaultFont() {
+		return new Font(defaultFontName, defaultFontStyle, defaultFontSize);
+	}
+	
+	public void setDefaultFont(Font font) {
+		defaultFontName = font.getFamily();
+		defaultFontStyle = font.getStyle();
+		defaultFontSize = font.getSize();
+	}
+	
 	public void read() throws IOException {
 		read(getPreferencesFile());
 	}
