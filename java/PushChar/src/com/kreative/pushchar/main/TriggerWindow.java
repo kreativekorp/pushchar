@@ -1,12 +1,16 @@
 package com.kreative.pushchar.main;
 
 import java.awt.BorderLayout;
-import java.awt.Window;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,82 +20,169 @@ import javax.swing.JWindow;
 public class TriggerWindow extends JWindow {
 	private static final long serialVersionUID = 1L;
 	
+	public static enum Position {
+		NORTHWEST {
+			@Override
+			protected Point getLocation(Rectangle screenRect, Dimension size) {
+				return new Point(screenRect.x, screenRect.y);
+			}
+		},
+		NORTHEAST {
+			@Override
+			protected Point getLocation(Rectangle screenRect, Dimension size) {
+				int x = screenRect.x + screenRect.width - size.width;
+				return new Point(x, screenRect.y);
+			}
+		},
+		SOUTHWEST {
+			@Override
+			protected Point getLocation(Rectangle screenRect, Dimension size) {
+				int y = screenRect.y + screenRect.height - size.height;
+				return new Point(screenRect.x, y);
+			}
+		},
+		SOUTHEAST {
+			@Override
+			protected Point getLocation(Rectangle screenRect, Dimension size) {
+				int x = screenRect.x + screenRect.width - size.width;
+				int y = screenRect.y + screenRect.height - size.height;
+				return new Point(x, y);
+			}
+		};
+		protected abstract Point getLocation(Rectangle screenRect, Dimension size);
+	}
+	
+	public static enum Orientation {
+		WEST_EAST(BorderLayout.WEST, BorderLayout.EAST),
+		NORTH_SOUTH(BorderLayout.NORTH, BorderLayout.SOUTH),
+		EAST_WEST(BorderLayout.EAST, BorderLayout.WEST),
+		SOUTH_NORTH(BorderLayout.SOUTH, BorderLayout.NORTH);
+		private final String pushConstraints;
+		private final String searchConstraints;
+		private Orientation(String pc, String sc) {
+			this.pushConstraints = pc;
+			this.searchConstraints = sc;
+		}
+	}
+	
+	private final WindowManager wm;
 	private final JLabel push;
 	private final JLabel search;
-	private Window pushWindow;
-	private Window searchWindow;
+	private JFrame pushWindow;
+	private JFrame searchWindow;
+	private Position position;
+	private Orientation orientation;
 	
-	public TriggerWindow() {
-		push = new JLabel(new ImageIcon(TriggerWindow.class.getResource("push.png")));
-		search = new JLabel(new ImageIcon(TriggerWindow.class.getResource("search.png")));
-		push.setVisible(false);
-		search.setVisible(false);
-		pushWindow = null;
-		searchWindow = null;
+	public TriggerWindow(WindowManager wm, Position position, Orientation orientation) {
+		this.wm = wm;
+		this.push = new JLabel(new ImageIcon(TriggerWindow.class.getResource("push.png")));
+		this.search = new JLabel(new ImageIcon(TriggerWindow.class.getResource("search.png")));
+		this.push.setVisible(false);
+		this.search.setVisible(false);
+		this.pushWindow = null;
+		this.searchWindow = null;
+		this.position = position;
+		this.orientation = orientation;
 		
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(push, BorderLayout.WEST);
-		panel.add(search, BorderLayout.EAST);
+		panel.add(push, orientation.pushConstraints);
+		panel.add(search, orientation.searchConstraints);
 		
 		setContentPane(panel);
 		setFocusable(false);
 		setFocusableWindowState(false);
 		setAlwaysOnTop(true);
-		pack();
+		packAndSetLocation();
 		
-		push.addMouseListener(new MouseAdapter() {
+		push.addMouseListener(new MyMouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (e.isPopupTrigger()) return;
 				if (pushWindow == null) return;
 				pushWindow.setVisible(true);
 			}
 		});
 		
-		search.addMouseListener(new MouseAdapter() {
+		search.addMouseListener(new MyMouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (e.isPopupTrigger()) return;
 				if (searchWindow == null) return;
 				searchWindow.setVisible(true);
 			}
 		});
 	}
 	
-	public Window getPushWindow() {
+	private class MyMouseAdapter extends MouseAdapter {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				TriggerMenu m = new TriggerMenu(wm);
+				m.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				TriggerMenu m = new TriggerMenu(wm);
+				m.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+	}
+	
+	public JFrame getPushWindow() {
 		return pushWindow;
 	}
 	
-	public Window getSearchWindow() {
+	public JFrame getSearchWindow() {
 		return searchWindow;
 	}
 	
-	public void setPushWindow(Window pushWindow) {
-		if (pushWindow instanceof JFrame) {
-			JFrame f = (JFrame)pushWindow;
-			f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		}
-		if (this.pushWindow != null) this.pushWindow.removeWindowListener(windowListener);
+	public void setPushWindow(JFrame pushWindow) {
+		if (pushWindow != null) pushWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		this.pushWindow = pushWindow;
-		if (this.pushWindow != null) this.pushWindow.addWindowListener(windowListener);
 		push.setVisible(this.pushWindow != null);
-		pack();
+		packAndSetLocation();
 	}
 	
-	public void setSearchWindow(Window searchWindow) {
-		if (searchWindow instanceof JFrame) {
-			JFrame f = (JFrame)searchWindow;
-			f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		}
-		if (this.searchWindow != null) this.searchWindow.removeWindowListener(windowListener);
+	public void setSearchWindow(JFrame searchWindow) {
+		if (searchWindow != null) searchWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		this.searchWindow = searchWindow;
-		if (this.searchWindow != null) this.searchWindow.addWindowListener(windowListener);
 		search.setVisible(this.searchWindow != null);
-		pack();
+		packAndSetLocation();
 	}
 	
-	private final WindowListener windowListener = new WindowAdapter() {
-		@Override
-		public void windowClosing(WindowEvent e) {
-			e.getWindow().setVisible(false);
-		}
-	};
+	public Position getPosition() {
+		return position;
+	}
+	
+	public Orientation getOrientation() {
+		return orientation;
+	}
+	
+	public void setPosition(Position position) {
+		this.position = position;
+		packAndSetLocation();
+	}
+	
+	public void setOrientation(Orientation orientation) {
+		this.orientation = orientation;
+		Container panel = getContentPane();
+		panel.add(push, orientation.pushConstraints);
+		panel.add(search, orientation.searchConstraints);
+		packAndSetLocation();
+	}
+	
+	private void packAndSetLocation() {
+		pack();
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsConfiguration config = env.getScreenDevices()[0].getDefaultConfiguration();
+		Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(config);
+		Rectangle screenRect = config.getBounds();
+		screenRect.x += insets.left;
+		screenRect.y += insets.top;
+		screenRect.width -= insets.left + insets.right;
+		screenRect.height -= insets.top + insets.bottom;
+		setLocation(position.getLocation(screenRect, getSize()));
+	}
 }

@@ -15,7 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 
-public class CopyMenuItem extends JMenuItem implements ActionListener, ClipboardOwner {
+public class CopyMenuItem extends JMenuItem {
 	private static final long serialVersionUID = 1L;
 	
 	public static final boolean IS_MAC_OS;
@@ -39,22 +39,21 @@ public class CopyMenuItem extends JMenuItem implements ActionListener, Clipboard
 		}
 	}
 	
-	private final String copyString;
-	private final Window hideWindow;
-	private final int[] keyStroke;
-	
-	public CopyMenuItem(String title, String copyString, Window hideWindow, int[] keyStroke) {
+	public CopyMenuItem(final String title, final String copyString, final Window hideWindow, final int[] keyStroke) {
 		super(title.replace("@", copyString));
-		this.copyString = copyString;
-		this.hideWindow = hideWindow;
-		this.keyStroke = keyStroke;
-		addActionListener(this);
+		addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				copy(copyString, hideWindow, keyStroke);
+			}
+		});
 	}
 	
-	@Override
-	public void actionPerformed(ActionEvent e) {
+	public static void copy(String copyString, Window hideWindow, int[] keyStroke) {
 		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		clipboard.setContents(new StringSelection(copyString), this);
+		clipboard.setContents(new StringSelection(copyString), new ClipboardOwner() {
+			@Override public void lostOwnership(Clipboard c, Transferable t) {}
+		});
 		if (hideWindow != null) hideWindow.setVisible(false);
 		if (keyStroke != null && keyStroke.length > 0) {
 			try {
@@ -89,10 +88,5 @@ public class CopyMenuItem extends JMenuItem implements ActionListener, Clipboard
 				x.printStackTrace();
 			}
 		}
-	}
-	
-	@Override
-	public void lostOwnership(Clipboard c, Transferable t) {
-		// I don't care.
 	}
 }

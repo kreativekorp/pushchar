@@ -28,13 +28,13 @@ public class CopyMenuBuilder {
 	}
 	
 	public void receiveEvent(MouseEvent e) {
-		if (e.isPopupTrigger()) {
+		if (chars != null && e.isPopupTrigger()) {
 			JPopupMenu m = buildMenu(parentWindow, pasteKeyStroke);
 			m.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
 	
-	public JPopupMenu buildMenu(Window hw, int[] ks) {
+	private JPopupMenu buildMenu(Window hw, int[] ks) {
 		JPopupMenu menu = new JPopupMenu();
 		menu.add(new CopyMenuItem("Copy", chars, null, null));
 		if (hw != null) {
