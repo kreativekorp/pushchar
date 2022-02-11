@@ -30,6 +30,9 @@ jni-bin: jni-src
 
 bin: src
 	mkdir -p bin
+ifeq ($(origin JAVACFLAGS), undefined)
+	$(eval JAVACFLAGS = $(shell dep/minJavaVerOpts))
+endif
 	javac $(JAVACFLAGS) -sourcepath src $(SRCFILES) -d bin
 	$(foreach res,$(RESFILES),cp src/$(res) bin/$(res);)
 
