@@ -160,10 +160,26 @@ public class NameDatabase {
 		}
 	}
 	
+	private synchronized void loadPropertyMap(Map<Integer,String> propertyMap) {
+		if (propertyMap == null || propertyMap.isEmpty()) return;
+		for (Map.Entry<Integer,String> e : propertyMap.entrySet()) {
+			String c = resolver.getCategory(e.getKey());
+			String n = resolver.getName(e.getKey());
+			NameValue v = getOrAdd(e.getKey(), c, n);
+			if (v.aliases.isEmpty()) v.aliases.add(n);
+			v.aliases.add(e.getValue());
+		}
+	}
+	
 	private class LoaderThread extends Thread {
 		@Override
 		public void run() {
 			loadPuaaTable(PuaaCache.getPuaaTable("unidata.ucd"), null);
+			
+			PuaaTable extras = PuaaCache.getPuaaTable("extras.ucd");
+			loadPropertyMap(extras.getPropertyMap("HTML_Entity"));
+			loadPropertyMap(extras.getPropertyMap("PostScript_Name"));
+			
 			String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 			for (String fontName : fontNames) {
 				Font font = new Font(fontName, 0, 12);
@@ -173,7 +189,7 @@ public class NameDatabase {
 		}
 	}
 	
-	private static final Pattern CP_PATTERN = Pattern.compile("^\\s*([Uu][+]|[0][Xx]|[$])?([0-9A-Fa-f]{1,6})([Hh])?\\s*$");
+	private static final Pattern CP_PATTERN = Pattern.compile("^\\s*([Uu][Nn][Ii]|[Uu][+]|[Uu]|[0][Xx]|[$])?([0-9A-Fa-f]{1,6})([Hh])?\\s*$");
 	private static final int MAX_RESULTS = 20;
 	
 	public synchronized List<NameEntry> find(String name) {

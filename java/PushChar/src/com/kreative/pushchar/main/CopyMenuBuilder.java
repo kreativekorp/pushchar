@@ -10,14 +10,16 @@ import com.kreative.pushchar.ttflib.PuaaTable;
 
 public class CopyMenuBuilder {
 	private final Map<Integer,String> entityMap;
+	private final Map<Integer,String> psNameMap;
 	private final NameResolver resolver;
 	private final Window parentWindow;
 	private final int[] pasteKeyStroke;
 	private String chars = null;
 	
 	public CopyMenuBuilder(NameResolver resolver, Window parentWindow, int[] pasteKeyStroke) {
-		PuaaTable entities = PuaaCache.getPuaaTable("entities.ucd");
-		this.entityMap = entities.getPropertyMap("HTML_Entity");
+		PuaaTable extras = PuaaCache.getPuaaTable("extras.ucd");
+		this.entityMap = extras.getPropertyMap("HTML_Entity");
+		this.psNameMap = extras.getPropertyMap("PostScript_Name");
 		this.resolver = resolver;
 		this.parentWindow = parentWindow;
 		this.pasteKeyStroke = pasteKeyStroke;
@@ -61,11 +63,18 @@ public class CopyMenuBuilder {
 		int[] utf32 = toUTF32(chars);
 		String[] names = new String[utf32.length];
 		String[] entities = new String[utf32.length];
+		String[] psnames = new String[utf32.length];
 		String[] python = new String[utf32.length];
 		for (int i = 0; i < utf32.length; i++) {
 			names[i] = resolver.getName(utf32[i]);
 			entities[i] = entityMap.get(utf32[i]);
 			if (entities[i] == null) entities[i] = ("&#" + utf32[i] + ";");
+			psnames[i] = psNameMap.get(utf32[i]);
+			if (psnames[i] == null) psnames[i] = (
+				(utf32[i] < 0x10000)
+				? ("uni" + toHexString(utf32[i], 4))
+				: ("u"   + toHexString(utf32[i], 5))
+			);
 			python[i] = (
 				(utf32[i] < 0x10000)
 				? ("\\u" + toHexString(utf32[i], 4))
@@ -77,6 +86,7 @@ public class CopyMenuBuilder {
 		menu.add(new CopyMenuItem("Hex: @", toHexString(utf32, 4, "", "", ", "), hw, ks));
 		menu.add(new CopyMenuItem("U+: @", "U+" + toHexString(utf32, 4, "", "", "+"), hw, ks));
 		menu.add(new CopyMenuItem("Name: @", join(names, ", "), hw, ks));
+		menu.add(new CopyMenuItem("PS Name: @", join(psnames, " "), hw, ks));
 		menu.addSeparator();
 		menu.add(new CopyMenuItem("HTML Name: @", join(entities, ""), hw, ks));
 		menu.add(new CopyMenuItem("HTML Dec: @", toDecString(utf32, "&#", ";", ""), hw, ks));
