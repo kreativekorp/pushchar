@@ -8,9 +8,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Encoding extends EncodingTable {
-	private final String name;
+	private String name;
 	
 	public Encoding(String name, InputStream in) {
 		this.name = name;
@@ -31,18 +33,37 @@ public class Encoding extends EncodingTable {
 		return name;
 	}
 	
+	private static final Pattern FUZZY_NAME = Pattern.compile(
+		"(map\\s+from\\s+)?(.+?)(\\s+character\\s+set)?(\\s+to\\s+unicode)?(\\s+table)?",
+		Pattern.CASE_INSENSITIVE
+	);
+	
 	private void read(Scanner in) {
 		while (in.hasNextLine()) {
 			String line = in.nextLine().trim();
-			if (line.length() > 0 && line.charAt(0) != '#') {
-				String[] parts = line.split("\\s+");
-				if (parts.length >= 2) {
-					try {
-						byte[] key = parseBytes(parts[0]);
-						String value = parseChars(parts[1]);
-						setSequence(value, key);
-					} catch (NumberFormatException nfe) {
-						continue;
+			if (line.length() > 0) {
+				String[] parts = line.split("#", 2);
+				line = parts[0].trim();
+				if (line.length() > 0) {
+					parts = line.split("\\s+");
+					if (parts.length > 1) {
+						try {
+							byte[] key = parseBytes(parts[0]);
+							String value = parseChars(parts[1]);
+							setSequence(value, key);
+						} catch (NumberFormatException nfe) {
+							continue;
+						}
+					}
+				} else if (parts.length > 1) {
+					line = parts[1].trim();
+					if (line.startsWith("Name:")) {
+						String name = line.substring(5).trim();
+						if (name.length() > 0) {
+							Matcher m = FUZZY_NAME.matcher(name);
+							String n2 = m.matches() ? m.group(2).trim() : name;
+							this.name = (n2.length() > 0) ? n2 : name;
+						}
 					}
 				}
 			}
@@ -78,7 +99,7 @@ public class Encoding extends EncodingTable {
 	
 	private static byte[] parseBytes(String s) {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		String[] parts = s.split("[+]");
+		String[] parts = s.split("[+,]");
 		for (String part : parts) {
 			part = part.toUpperCase();
 			if (part.startsWith("0X")) part = part.substring(2);
@@ -93,7 +114,7 @@ public class Encoding extends EncodingTable {
 	
 	private static String parseChars(String s) {
 		StringBuffer sb = new StringBuffer();
-		String[] parts = s.split("[+]");
+		String[] parts = s.split("[+,]");
 		for (String part : parts) {
 			part = part.toUpperCase();
 			if (part.startsWith("0X")) part = part.substring(2);
