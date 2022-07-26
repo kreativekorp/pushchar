@@ -1,4 +1,4 @@
-package com.kreative.pushchar.test;
+package com.kreative.pushchar.ttfbin;
 
 import java.io.File;
 import java.io.FileOutputStream;

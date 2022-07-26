@@ -1,4 +1,4 @@
-package com.kreative.pushchar.test;
+package com.kreative.pushchar.ttfbin;
 
 import java.awt.Font;
 import java.awt.font.OpenType;
