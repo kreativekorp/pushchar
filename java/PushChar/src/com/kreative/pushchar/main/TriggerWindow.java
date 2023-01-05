@@ -26,6 +26,10 @@ public class TriggerWindow extends JWindow {
 			protected Point getLocation(Rectangle screenRect, Dimension size) {
 				return new Point(screenRect.x, screenRect.y);
 			}
+			@Override
+			protected Point getMenuLocation(MouseEvent e, TriggerMenu m) {
+				return e.getPoint();
+			}
 		},
 		NORTHEAST {
 			@Override
@@ -33,12 +37,22 @@ public class TriggerWindow extends JWindow {
 				int x = screenRect.x + screenRect.width - size.width;
 				return new Point(x, screenRect.y);
 			}
+			@Override
+			protected Point getMenuLocation(MouseEvent e, TriggerMenu m) {
+				int x = e.getX() - m.getPreferredSize().width + 1;
+				return new Point(x, e.getY());
+			}
 		},
 		SOUTHWEST {
 			@Override
 			protected Point getLocation(Rectangle screenRect, Dimension size) {
 				int y = screenRect.y + screenRect.height - size.height;
 				return new Point(screenRect.x, y);
+			}
+			@Override
+			protected Point getMenuLocation(MouseEvent e, TriggerMenu m) {
+				int y = e.getY() - m.getPreferredSize().height + 1;
+				return new Point(e.getX(), y);
 			}
 		},
 		SOUTHEAST {
@@ -48,8 +62,16 @@ public class TriggerWindow extends JWindow {
 				int y = screenRect.y + screenRect.height - size.height;
 				return new Point(x, y);
 			}
+			@Override
+			protected Point getMenuLocation(MouseEvent e, TriggerMenu m) {
+				Dimension ps = m.getPreferredSize();
+				int x = e.getX() - ps.width + 1;
+				int y = e.getY() - ps.height + 1;
+				return new Point(x, y);
+			}
 		};
 		protected abstract Point getLocation(Rectangle screenRect, Dimension size);
+		protected abstract Point getMenuLocation(MouseEvent e, TriggerMenu m);
 	}
 	
 	public static enum Orientation {
@@ -65,7 +87,7 @@ public class TriggerWindow extends JWindow {
 		}
 	}
 	
-	private final WindowManager wm;
+	private final TriggerMenu menu;
 	private final JLabel push;
 	private final JLabel search;
 	private JFrame pushWindow;
@@ -74,7 +96,7 @@ public class TriggerWindow extends JWindow {
 	private Orientation orientation;
 	
 	public TriggerWindow(WindowManager wm, Position position, Orientation orientation) {
-		this.wm = wm;
+		this.menu = new TriggerMenu(wm);
 		this.push = new JLabel(new ImageIcon(TriggerWindow.class.getResource("push.png")));
 		this.search = new JLabel(new ImageIcon(TriggerWindow.class.getResource("search.png")));
 		this.push.setVisible(false);
@@ -117,15 +139,15 @@ public class TriggerWindow extends JWindow {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.isPopupTrigger()) {
-				TriggerMenu m = new TriggerMenu(wm);
-				m.show(e.getComponent(), e.getX(), e.getY());
+				Point p = position.getMenuLocation(e, menu);
+				menu.show(e.getComponent(), p.x, p.y);
 			}
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			if (e.isPopupTrigger()) {
-				TriggerMenu m = new TriggerMenu(wm);
-				m.show(e.getComponent(), e.getX(), e.getY());
+				Point p = position.getMenuLocation(e, menu);
+				menu.show(e.getComponent(), p.x, p.y);
 			}
 		}
 	}
