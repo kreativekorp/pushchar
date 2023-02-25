@@ -1,6 +1,6 @@
 SRCFILES := $(shell find src -name \*.java)
 RESFILES := $(shell find src -type f \! -name .\* \! -name \*.java | sed s/^src\\///)
-PACKAGES := $(shell find src -name \*.java | sed -E s/^src\\/\|\\/[^\\/]+$$//g | sort | uniq | tr / .)
+PACKAGES := $(shell find src -name \*.java | sed -E s/^src\\/\|\\/[^\\/]+$$//g | grep -v \\.java$$ | sort | uniq | tr / .)
 
 all: clean bin doc pushchar.jar pushchar.zip PushChar.app
 
@@ -58,19 +58,39 @@ pushchar.zip: dep pushchar.jar
 	zip -r pushchar.zip PushChar
 	rm -rf PushChar
 
-PushChar.app: dep pushchar.jar
-	mkdir -p PushChar.app/Contents/MacOS
-	mkdir -p PushChar.app/Contents/Resources/Java
-	cp -f dep/PkgInfo PushChar.app/Contents
-	cp -f dep/Info.plist PushChar.app/Contents
-	cp -f dep/universalJavaApplicationStub PushChar.app/Contents/MacOS/PushChar
-	cp -f dep/PushChar.icns PushChar.app/Contents/Resources
-	cp -f pushchar.jar PushChar.app/Contents/Resources/Java
+PushChar.app: PushChar-Pre10.15.app PushChar-MacOS10.15.app PushChar-MacOS11.0.app
+
+PushChar-Pre10.15.app: dep pushchar.jar
+	mkdir -p PushChar-Pre10.15.app/Contents/MacOS
+	mkdir -p PushChar-Pre10.15.app/Contents/Resources/Java
+	cp -f dep/PkgInfo PushChar-Pre10.15.app/Contents
+	cp -f dep/Info.plist PushChar-Pre10.15.app/Contents
+	cp -f dep/universalJavaApplicationStub-Pre10.15 PushChar-Pre10.15.app/Contents/MacOS/PushChar
+	cp -f dep/PushChar.icns PushChar-Pre10.15.app/Contents/Resources
+	cp -f pushchar.jar PushChar-Pre10.15.app/Contents/Resources/Java
+
+PushChar-MacOS10.15.app: dep pushchar.jar
+	mkdir -p PushChar-MacOS10.15.app/Contents/MacOS
+	mkdir -p PushChar-MacOS10.15.app/Contents/Resources/Java
+	cp -f dep/PkgInfo PushChar-MacOS10.15.app/Contents
+	cp -f dep/Info.plist PushChar-MacOS10.15.app/Contents
+	cp -f dep/universalJavaApplicationStub-MacOS10.15 PushChar-MacOS10.15.app/Contents/MacOS/PushChar
+	cp -f dep/PushChar.icns PushChar-MacOS10.15.app/Contents/Resources
+	cp -f pushchar.jar PushChar-MacOS10.15.app/Contents/Resources/Java
+
+PushChar-MacOS11.0.app: dep pushchar.jar
+	mkdir -p PushChar-MacOS11.0.app/Contents/MacOS
+	mkdir -p PushChar-MacOS11.0.app/Contents/Resources/Java
+	cp -f dep/PkgInfo PushChar-MacOS11.0.app/Contents
+	cp -f dep/Info.plist PushChar-MacOS11.0.app/Contents
+	cp -f dep/universalJavaApplicationStub-MacOS11.0 PushChar-MacOS11.0.app/Contents/MacOS/PushChar
+	cp -f dep/PushChar.icns PushChar-MacOS11.0.app/Contents/Resources
+	cp -f pushchar.jar PushChar-MacOS11.0.app/Contents/Resources/Java
 
 pushchar.dmg: PushChar.app
 	rm -rf dmgtmp
 	mkdir -p dmgtmp
-	cp -R PushChar.app dmgtmp
+	cp -R PushChar*.app dmgtmp
 	hdiutil create -fs HFS+ -volname "PushChar" -srcfolder dmgtmp pushchar.dmg
 	rm -rf dmgtmp
 
