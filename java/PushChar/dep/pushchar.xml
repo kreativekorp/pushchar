@@ -16,12 +16,12 @@
     <maxHeapSize>1024</maxHeapSize>
   </jre>
   <versionInfo>
-    <fileVersion>2.2.0.0</fileVersion>
-    <txtFileVersion>2.2</txtFileVersion>
+    <fileVersion>2.2.1.0</fileVersion>
+    <txtFileVersion>2.2.1</txtFileVersion>
     <fileDescription>PushChar</fileDescription>
-    <copyright>(C) 2008-2022 Kreative Software</copyright>
-    <productVersion>2.2.0.0</productVersion>
-    <txtProductVersion>2.2</txtProductVersion>
+    <copyright>(C) 2008-2023 Kreative Software</copyright>
+    <productVersion>2.2.1.0</productVersion>
+    <txtProductVersion>2.2.1</txtProductVersion>
     <productName>PushChar</productName>
     <companyName>Kreative Software</companyName>
     <internalName>PushChar</internalName>
