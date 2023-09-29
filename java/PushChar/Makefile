@@ -2,9 +2,9 @@ SRCFILES := $(shell find src -name \*.java)
 RESFILES := $(shell find src -type f \! -name .\* \! -name \*.java | sed s/^src\\///)
 PACKAGES := $(shell find src -name \*.java | sed -E s/^src\\/\|\\/[^\\/]+$$//g | grep -v \\.java$$ | sort | uniq | tr / .)
 
-all: clean bin doc pushchar.jar pushchar.zip PushChar.app
+all: clean bin doc pushchar.jar pushchar.zip PushChar.app pushchar.app.zip
 
-eclipseall: eclipseclean pushchar.jar pushchar.zip PushChar.app
+eclipseall: eclipseclean pushchar.jar pushchar.zip PushChar.app pushchar.app.zip
 
 clean:
 	rm -rf bin
@@ -86,6 +86,9 @@ PushChar-MacOS11.0.app: dep pushchar.jar
 	cp -f dep/universalJavaApplicationStub-MacOS11.0 PushChar-MacOS11.0.app/Contents/MacOS/PushChar
 	cp -f dep/PushChar.icns PushChar-MacOS11.0.app/Contents/Resources
 	cp -f pushchar.jar PushChar-MacOS11.0.app/Contents/Resources/Java
+
+pushchar.app.zip: PushChar.app
+	zip -r pushchar.app.zip PushChar*.app
 
 pushchar.dmg: PushChar.app
 	rm -rf dmgtmp

@@ -24,8 +24,8 @@ public class Main {
 		while (argi < args.length) {
 			String arg = args[argi++];
 			if (arg.equalsIgnoreCase("-version") || arg.equalsIgnoreCase("--version")) {
-				System.out.println("PushChar 2.2");
-				System.out.println("(c) 2012-2022 Kreative Software");
+				System.out.println("PushChar 2.2.1");
+				System.out.println("(c) 2012-2023 Kreative Software");
 				if (mode == Mode.AUTO) mode = Mode.INFO;
 			} else if (arg.equalsIgnoreCase("-help") || arg.equalsIgnoreCase("--help")) {
 				System.out.println("java -jar pushchar.jar [ -f <fontname> ] [ -b | -i | -bi ] [ -s <fontsize> ]");
