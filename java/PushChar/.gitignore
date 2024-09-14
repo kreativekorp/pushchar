@@ -1,2 +1,4 @@
-bin/*
-doc/*
+/bin/
+/doc/
+pushchar.app.zip
+pushchar.zip
